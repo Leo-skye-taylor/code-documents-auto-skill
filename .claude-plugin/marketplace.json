@@ -1,9 +1,23 @@
 {
   "name": "code-documents-auto-skill",
+  "owner": {
+    "name": "trainMini",
+    "email": "trainMini@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "Automatic code documentation management skills for Claude Code",
+    "version": "1.0.0"
+  },
   "plugins": [
     {
       "name": "code-documents-auto",
-      "source": "./"
+      "source": {
+        "source": "url",
+        "url": "https://github.com/trainMini/code-documents-auto-skill.git"
+      },
+      "description": "Force AI to read and archive documentation before/after code changes",
+      "version": "1.0.0",
+      "strict": true
     }
   ]
 }
