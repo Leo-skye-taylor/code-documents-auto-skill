@@ -110,21 +110,13 @@ git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/s
 
 ### ⚙️ How It Works
 
-```mermaid
-graph LR
-    A[User Request] --> B[PreToolUse Hook]
-    B --> C{Unarchived Changes?}
-    C -->|Yes| D[Block & Read Docs]
-    C -->|No| E[AI Implements]
-    E --> F[PostToolUse Hook]
-    F --> G[Record Changes]
-    G --> H[AI Summarizes]
-    H --> I[Auto Archive]
-    I --> J[Stop Hook]
-    J --> K{All Archived?}
-    K -->|Yes| L[✅ Complete]
-    K -->|No| M[Block & Archive]
-```
+| Step | Hook | Action |
+|------|------|--------|
+| 1️⃣ | PreToolUse | Check for unarchived changes → Block if needed |
+| 2️⃣ | - | AI implements the feature |
+| 3️⃣ | PostToolUse | Record file changes → Prompt AI to summarize |
+| 4️⃣ | - | AI summarizes & runs archive command |
+| 5️⃣ | Stop | Ensure all changes archived → Block if not |
 
 ### 📁 File Structure
 
@@ -229,21 +221,13 @@ git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/s
 
 ### ⚙️ 工作原理
 
-```mermaid
-graph LR
-    A[用户请求] --> B[PreToolUse Hook]
-    B --> C{有未归档修改?}
-    C -->|是| D[阻止并读取文档]
-    C -->|否| E[AI 实现功能]
-    E --> F[PostToolUse Hook]
-    F --> G[记录变更]
-    G --> H[AI 总结]
-    H --> I[自动归档]
-    I --> J[Stop Hook]
-    J --> K{全部归档?}
-    K -->|是| L[✅ 完成]
-    K -->|否| M[阻止并归档]
-```
+| 步骤 | Hook | 动作 |
+|------|------|------|
+| 1️⃣ | PreToolUse | 检查未归档修改 → 有则阻止 |
+| 2️⃣ | - | AI 实现功能 |
+| 3️⃣ | PostToolUse | 记录文件变更 → 提示 AI 总结 |
+| 4️⃣ | - | AI 总结并执行归档命令 |
+| 5️⃣ | Stop | 确保全部归档 → 未归档则阻止 |
 
 ### 📁 文件结构
 
