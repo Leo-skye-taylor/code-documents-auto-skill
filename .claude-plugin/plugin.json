@@ -1,5 +1,5 @@
 {
   "name": "code-documents-auto",
-  "description": "Automatic code documentation management skill for Claude Code",
-  "version": "1.0.0"
+  "description": "Code documentation management skill for Claude Code - driven by commands",
+  "version": "2.0.0"
 }
