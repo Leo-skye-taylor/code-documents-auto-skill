@@ -1,48 +1,73 @@
-# Code Documents Auto Skill
+# 🚀 Code Documents Auto Skill
 
-[English](#english) | [中文](#中文)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)]()
+
+[English](#-english) | [中文](#-中文)
 
 ---
 
-## English
+## 🎯 What is this?
 
-### Overview
+> **Automatically manage code documentation with Claude Code hooks!**
+>
+> No manual commands. No manual reading. No manual archiving.
+> Just tell AI what to do, and everything happens automatically.
 
-This skill provides comprehensive code documentation management optimized for AI consumption. It automates the process of scanning codebases, generating structured documentation, enforcing pre-development reading, and recording complete change audit trails.
-
-**All operations are fully automated - no manual user actions required.**
-
-### Features
-
-- **Auto Documentation Scanning**: Scans codebase and generates structured documentation
-- **Auto Change Recording**: Automatically records modified files during code editing
-- **Auto Archiving**: AI summarizes changes and auto-generates changelog
-- **Auto Module Updates**: Automatically updates module documentation
-- **Force Workflow**: Ensures documentation is always up-to-date
-
-### Installation
-
-**Method 1: Via Marketplace (Recommended)**
-
-1. Add the marketplace:
-```bash
-/plugin marketplace add trainMini/code-documents-auto-skill
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    🔄 Auto Workflow                         │
+├─────────────────────────────────────────────────────────────┤
+│  User: "Add login feature"                                  │
+│      ↓                                                      │
+│  📖 AI reads docs automatically                             │
+│      ↓                                                      │
+│  💻 AI implements feature                                   │
+│      ↓                                                      │
+│  📝 AI summarizes & archives                                │
+│      ↓                                                      │
+│  ✅ Done! Documentation updated                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-2. Install the plugin:
+---
+
+## 🇺🇸 English
+
+### ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 📖 **Auto Read** | AI reads all related docs before coding |
+| 📝 **Auto Record** | Automatically tracks all file changes |
+| 🗄️ **Auto Archive** | AI summarizes and generates changelog |
+| 🔄 **Auto Update** | Module docs updated automatically |
+| 🚫 **No Manual Work** | Everything is fully automated |
+
+### 📦 Installation
+
+#### Method 1: Via Marketplace ⭐ Recommended
+
 ```bash
+# Step 1: Add marketplace
+/plugin marketplace add trainMini/code-documents-auto-skill
+
+# Step 2: Install plugin
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
-**Method 2: Manual Installation**
+#### Method 2: Manual Installation
 
-1. Clone the repository:
+<details>
+<summary>Click to expand 👆</summary>
+
 ```bash
+# 1. Clone repository
 git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/skills/code-documents-auto-skill
-```
 
-2. Configure hooks in `~/.claude/settings.json`:
-```json
+# 2. Add hooks to ~/.claude/settings.json
 {
   "hooks": {
     "PreToolUse": [
@@ -81,81 +106,87 @@ git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/s
 }
 ```
 
-### How It Works
+</details>
 
-1. **Before Editing**: PreToolUse hook checks if there are unarchived changes
-2. **After Editing**: PostToolUse hook records modified files and prompts AI to summarize
-3. **Auto Archive**: AI summarizes changes and runs archive command
-4. **Before Stopping**: Stop hook ensures all changes are archived
+### ⚙️ How It Works
 
-### File Structure
+```mermaid
+graph LR
+    A[User Request] --> B[PreToolUse Hook]
+    B --> C{Unarchived Changes?}
+    C -->|Yes| D[Block & Read Docs]
+    C -->|No| E[AI Implements]
+    E --> F[PostToolUse Hook]
+    F --> G[Record Changes]
+    G --> H[AI Summarizes]
+    H --> I[Auto Archive]
+    I --> J[Stop Hook]
+    J --> K{All Archived?}
+    K -->|Yes| L[✅ Complete]
+    K -->|No| M[Block & Archive]
+```
+
+### 📁 File Structure
 
 ```
 your-project/
-├── .ai-context/
-│   ├── .workflow-log.json          # Workflow log
-│   ├── README.md                   # Project overview
-│   ├── architecture.md             # System architecture
-│   ├── guidelines/                 # Coding guidelines
-│   ├── modules/                    # Module documentation
-│   ├── features/                   # Feature documentation
-│   ├── api/                        # API documentation
-│   ├── changelog/                  # Change logs
-│   └── decisions/                  # Decision records
-├── CLAUDE.md                       # Project rules
-└── AGENTS.md                       # Agent rules
+├── 📂 .ai-context/
+│   ├── 📄 .workflow-log.json     # 🔄 Workflow state
+│   ├── 📄 README.md              # 📋 Project overview
+│   ├── 📄 architecture.md        # 🏗️ System architecture
+│   ├── 📂 guidelines/            # 📏 Coding standards
+│   ├── 📂 modules/               # 📦 Module docs
+│   ├── 📂 features/              # ✨ Feature docs
+│   ├── 📂 api/                   # 🔌 API docs
+│   ├── 📂 changelog/             # 📝 Change history
+│   └── 📂 decisions/             # 🤔 Decision records
+├── 📄 CLAUDE.md                   # 🤖 AI rules
+└── 📄 AGENTS.md                   # 🎯 Agent rules
 ```
 
-### Commands
+### 🛠️ Commands
 
-- **Scan Codebase**: `bash ~/.claude/skills/code-documents-auto-skill/scripts/scan-codebase.sh`
-- **Force Archive**: `bash ~/.claude/skills/code-documents-auto-skill/hooks/force-archive.sh "summary"`
-
-### License
-
-MIT License
+| Command | Description |
+|---------|-------------|
+| `bash ~/.claude/skills/code-documents-auto-skill/scripts/scan-codebase.sh` | 🔍 Scan codebase |
+| `bash ~/.claude/skills/code-documents-auto-skill/hooks/force-archive.sh "summary"` | 🗄️ Force archive |
 
 ---
 
-## 中文
+## 🇨🇳 中文
 
-### 概述
+### ✨ 功能特性
 
-这是一个 Claude Code 技能，用于自动管理代码文档。它自动扫描代码库、生成结构化文档、强制开发前读取文档，并记录完整的变更审计跟踪。
+| 功能 | 描述 |
+|------|------|
+| 📖 **自动读取** | 编码前 AI 自动读取所有相关文档 |
+| 📝 **自动记录** | 自动追踪所有文件变更 |
+| 🗄️ **自动归档** | AI 总结并生成变更日志 |
+| 🔄 **自动更新** | 模块文档自动更新 |
+| 🚫 **无需手动** | 一切全自动完成 |
 
-**所有操作都是全自动的，用户无需手动操作。**
+### 📦 安装步骤
 
-### 功能特性
+#### 方式一：通过市场安装 ⭐ 推荐
 
-- **自动文档扫描**：扫描代码库并生成结构化文档
-- **自动变更记录**：在代码编辑过程中自动记录修改的文件
-- **自动归档**：AI 总结改动内容并自动生成变更日志
-- **自动模块更新**：自动更新模块文档
-- **强制工作流**：确保文档始终保持最新
-
-### 安装步骤
-
-**方式一：通过市场安装（推荐）**
-
-1. 添加市场：
 ```bash
+# 第一步：添加市场
 /plugin marketplace add trainMini/code-documents-auto-skill
-```
 
-2. 安装插件：
-```bash
+# 第二步：安装插件
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
-**方式二：手动安装**
+#### 方式二：手动安装
 
-1. 克隆仓库：
+<details>
+<summary>点击展开 👆</summary>
+
 ```bash
+# 1. 克隆仓库
 git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/skills/code-documents-auto-skill
-```
 
-2. 在 `~/.claude/settings.json` 中配置 hooks：
-```json
+# 2. 在 ~/.claude/settings.json 中添加 hooks
 {
   "hooks": {
     "PreToolUse": [
@@ -194,36 +225,85 @@ git clone https://github.com/trainMini/code-documents-auto-skill.git ~/.claude/s
 }
 ```
 
-### 工作原理
+</details>
 
-1. **编辑前**：PreToolUse hook 检查是否有未归档的修改
-2. **编辑后**：PostToolUse hook 记录修改的文件并提示 AI 总结
-3. **自动归档**：AI 总结改动内容并执行归档命令
-4. **停止前**：Stop hook 确保所有修改都已归档
+### ⚙️ 工作原理
 
-### 文件结构
+```mermaid
+graph LR
+    A[用户请求] --> B[PreToolUse Hook]
+    B --> C{有未归档修改?}
+    C -->|是| D[阻止并读取文档]
+    C -->|否| E[AI 实现功能]
+    E --> F[PostToolUse Hook]
+    F --> G[记录变更]
+    G --> H[AI 总结]
+    H --> I[自动归档]
+    I --> J[Stop Hook]
+    J --> K{全部归档?}
+    K -->|是| L[✅ 完成]
+    K -->|否| M[阻止并归档]
+```
+
+### 📁 文件结构
 
 ```
 your-project/
-├── .ai-context/
-│   ├── .workflow-log.json          # 工作流日志
-│   ├── README.md                   # 项目概览
-│   ├── architecture.md             # 系统架构
-│   ├── guidelines/                 # 编码规范
-│   ├── modules/                    # 模块文档
-│   ├── features/                   # 功能文档
-│   ├── api/                        # API 文档
-│   ├── changelog/                  # 变更日志
-│   └── decisions/                  # 决策记录
-├── CLAUDE.md                       # 项目规则
-└── AGENTS.md                       # Agent 规则
+├── 📂 .ai-context/
+│   ├── 📄 .workflow-log.json     # 🔄 工作流状态
+│   ├── 📄 README.md              # 📋 项目概览
+│   ├── 📄 architecture.md        # 🏗️ 系统架构
+│   ├── 📂 guidelines/            # 📏 编码规范
+│   ├── 📂 modules/               # 📦 模块文档
+│   ├── 📂 features/              # ✨ 功能文档
+│   ├── 📂 api/                   # 🔌 API 文档
+│   ├── 📂 changelog/             # 📝 变更历史
+│   └── 📂 decisions/             # 🤔 决策记录
+├── 📄 CLAUDE.md                   # 🤖 AI 规则
+└── 📄 AGENTS.md                   # 🎯 Agent 规则
 ```
 
-### 命令
+### 🛠️ 命令
 
-- **扫描代码库**：`bash ~/.claude/skills/code-documents-auto-skill/scripts/scan-codebase.sh`
-- **强制归档**：`bash ~/.claude/skills/code-documents-auto-skill/hooks/force-archive.sh "总结内容"`
+| 命令 | 描述 |
+|------|------|
+| `bash ~/.claude/skills/code-documents-auto-skill/scripts/scan-codebase.sh` | 🔍 扫描代码库 |
+| `bash ~/.claude/skills/code-documents-auto-skill/hooks/force-archive.sh "summary"` | 🗄️ 强制归档 |
 
-### 许可证
+---
 
-MIT License
+## 📊 Stats
+
+![GitHub Stars](https://img.shields.io/github/stars/trainMini/code-documents-auto-skill?style=social)
+![GitHub Forks](https://img.shields.io/github/forks/trainMini/code-documents-auto-skill?style=social)
+![GitHub Issues](https://img.shields.io/github/issues/trainMini/code-documents-auto-skill)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/trainMini/code-documents-auto-skill)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [trainMini](https://github.com/trainMini)**
+
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github)](https://github.com/trainMini)
+[![Twitter](https://img.shields.io/badge/Twitter-Follow-1DA1F2?style=for-the-badge&logo=twitter)](https://twitter.com/trainMini)
+
+</div>
