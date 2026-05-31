@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*.bak.*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Claude local config
+.claude/
