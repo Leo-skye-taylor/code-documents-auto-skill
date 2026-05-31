@@ -5,7 +5,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)]()
 
-[English](#-english) | [中文](#-中文)
+[English](#english) | [中文](#中文)
 
 ---
 
@@ -34,7 +34,7 @@
 
 ---
 
-## 🇺🇸 English
+## English
 
 ### ✨ Features
 
@@ -145,7 +145,7 @@ your-project/
 
 ---
 
-## 🇨🇳 中文
+## 中文
 
 ### ✨ 功能特性
 
