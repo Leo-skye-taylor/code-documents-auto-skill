@@ -22,13 +22,7 @@ This skill provides comprehensive code documentation management optimized for AI
 
 ### Installation
 
-**Method 1: Direct Install (Recommended)**
-
-```bash
-/plugin install code-documents-auto@trainMini/code-documents-auto-skill
-```
-
-**Method 2: Via Marketplace**
+**Method 1: Via Marketplace (Recommended)**
 
 1. Add the marketplace:
 ```bash
@@ -40,7 +34,7 @@ This skill provides comprehensive code documentation management optimized for AI
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
-**Method 3: Manual Installation**
+**Method 2: Manual Installation**
 
 1. Clone the repository:
 ```bash
@@ -141,13 +135,7 @@ MIT License
 
 ### 安装步骤
 
-**方式一：直接安装（推荐）**
-
-```bash
-/plugin install code-documents-auto@trainMini/code-documents-auto-skill
-```
-
-**方式二：通过市场安装**
+**方式一：通过市场安装（推荐）**
 
 1. 添加市场：
 ```bash
@@ -159,7 +147,7 @@ MIT License
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
-**方式三：手动安装**
+**方式二：手动安装**
 
 1. 克隆仓库：
 ```bash
