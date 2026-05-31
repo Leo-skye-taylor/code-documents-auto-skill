@@ -1,0 +1,9 @@
+{
+  "name": "code-documents-auto-skill",
+  "plugins": [
+    {
+      "name": "code-documents-auto",
+      "source": "./"
+    }
+  ]
+}
