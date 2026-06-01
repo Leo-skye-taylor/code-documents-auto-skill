@@ -1,17 +1,18 @@
 # 🚀 Code Documents Auto Skill
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)]()
 
 [English](#english) | [中文](#中文)
 
 ---
 
-## 🎯 What is this?
+## English
 
-> **Manage code documentation with simple commands!**
+### 🎯 What is this?
+
+> **AI-driven code documentation management!**
 >
 > Just tell AI what you want to do, and it handles everything automatically.
 
@@ -19,32 +20,33 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                    🔄 Simple Workflow                       │
 ├─────────────────────────────────────────────────────────────┤
+│  User: "/docs-scan"                                         │
+│      ↓                                                      │
+│  🤖 AI scans codebase and generates documentation           │
+│      ↓                                                      │
 │  User: "/code-documents-auto add login feature"             │
 │      ↓                                                      │
-│  📖 AI reads related docs automatically                     │
+│  📖 AI reads related docs and outputs development plan      │
 │      ↓                                                      │
 │  💻 User implements the feature                             │
 │      ↓                                                      │
 │  User: "/code-documents-auto done, archive"                 │
 │      ↓                                                      │
-│  📝 AI summarizes & archives changes                        │
+│  📝 AI summarizes & updates all related docs                │
 │      ↓                                                      │
 │  ✅ Documentation updated!                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## English
-
 ### ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-| 📖 **Auto Read** | AI reads all related docs before coding |
-| 📝 **Auto Archive** | AI summarizes and generates changelog |
-| 🔄 **Auto Update** | Module docs updated automatically |
-| 🚀 **Simple Commands** | Just `/code-documents-auto <task>` |
+| 🤖 **AI-Driven** | All analysis done by AI, not scripts |
+| 📖 **Auto Read** | AI reads docs and outputs development plan before coding |
+| 📝 **Auto Archive** | AI summarizes changes and updates all related docs |
+| 🔄 **Incremental Update** | Support incremental updates, only update changed parts |
+| 🚀 **Simple Commands** | Just `/docs-scan` and `/code-documents-auto` |
 
 ### 📦 Installation
 
@@ -56,75 +58,110 @@
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
+### 🔄 Update
+
+When a new version is available, run:
+
+```bash
+# Uninstall old version
+/plugin uninstall code-documents-auto@code-documents-auto-skill
+
+# Clear cache (optional but recommended)
+rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
+
+# Reinstall latest version
+/plugin install code-documents-auto@code-documents-auto-skill
+```
+
 ### 🎮 Usage
+
+#### Commands
+
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `/docs-scan` | Full scan, generate all docs | First time, after major refactor |
+| `/docs-scan --update` | Incremental update | After daily development |
+| `/code-documents-auto <task>` | Read mode, output dev plan | Before starting a task |
+| `/code-documents-auto archive` | Archive mode, update docs | After development |
+
+#### First Time Setup
+
+```
+/docs-scan
+```
 
 #### Before Development
 
-Tell AI what you want to do:
-
 ```
-/code-documents-auto add cross-origin request configuration
+/code-documents-auto add cross-origin configuration
 /code-documents-auto fix login bug
-/code-documents-auto refactor database layer
 ```
-
-AI will automatically:
-1. Parse your task description
-2. Find and read all related documentation
-3. Show you a summary of what it read
 
 #### After Development
 
-Tell AI you're done:
-
 ```
 /code-documents-auto done, archive
-/code-documents-auto finished
-/code-documents-auto archive
 ```
-
-AI will automatically:
-1. Detect changed files
-2. Generate changelog
-3. Update module documentation
-4. Show you a summary of what was archived
 
 ### 📁 File Structure
 
 ```
-your-project/
-├── 📂 .ai-context/
-│   ├── 📄 README.md              # 📋 Project overview
-│   ├── 📄 architecture.md        # 🏗️ System architecture
-│   ├── 📂 guidelines/            # 📏 Coding standards
-│   ├── 📂 modules/               # 📦 Module docs
-│   ├── 📂 features/              # ✨ Feature docs
-│   ├── 📂 api/                   # 🔌 API docs
-│   ├── 📂 changelog/             # 📝 Change history
-│   └── 📂 decisions/             # 🤔 Decision records
-├── 📄 CLAUDE.md                   # 🤖 AI rules
-└── 📄 AGENTS.md                   # 🎯 Agent rules
+project-root/
+├── CLAUDE.md                        # Workflow rules
+├── AGENTS.md                        # AI Agent behavior rules
+└── .ai-context/
+    ├── README.md                    # Project overview
+    ├── architecture.md              # System architecture
+    ├── modules/                     # Module docs
+    ├── api/                         # API docs
+    ├── database/                    # Database design
+    ├── middleware/                   # Middleware usage
+    ├── guidelines/                  # Coding standards
+    ├── changelog/                   # Change history
+    └── decisions/                   # Decision records
 ```
-
-### 🛠️ Commands
-
-| Command | Description |
-|---------|-------------|
-| `/code-documents-auto <task>` | 📖 Read docs or 📝 archive changes |
-| `/docs-scan` | 🔍 Initial codebase scan |
 
 ---
 
 ## 中文
 
+### 🎯 这是什么？
+
+> **AI 驱动的代码文档管理！**
+>
+> 只需告诉 AI 你想做什么，它会自动处理一切。
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    🔄 简单工作流                              │
+├─────────────────────────────────────────────────────────────┤
+│  用户: "/docs-scan"                                          │
+│      ↓                                                       │
+│  🤖 AI 扫描代码库并生成文档                                    │
+│      ↓                                                       │
+│  用户: "/code-documents-auto 添加登录功能"                     │
+│      ↓                                                       │
+│  📖 AI 自动读取相关文档并输出开发方案                            │
+│      ↓                                                       │
+│  💻 用户实现功能                                               │
+│      ↓                                                       │
+│  用户: "/code-documents-auto 开发完了，归档"                    │
+│      ↓                                                       │
+│  📝 AI 总结变更并更新所有相关文档                                │
+│      ↓                                                       │
+│  ✅ 文档已更新！                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### ✨ 功能特性
 
 | 功能 | 描述 |
 |------|------|
-| 📖 **自动读取** | 编码前 AI 自动读取所有相关文档 |
-| 📝 **自动归档** | AI 总结并生成变更日志 |
-| 🔄 **自动更新** | 模块文档自动更新 |
-| 🚀 **简单指令** | 只需 `/code-documents-auto <任务>` |
+| 🤖 **AI 驱动** | 所有分析由 AI 完成，不使用脚本 |
+| 📖 **自动读取** | 编码前 AI 自动读取文档并输出开发方案 |
+| 📝 **自动归档** | AI 总结变更并更新所有相关文档 |
+| 🔄 **增量更新** | 支持增量更新，只更新变更部分 |
+| 🚀 **简单指令** | 只需 `/docs-scan` 和 `/code-documents-auto` |
 
 ### 📦 安装步骤
 
@@ -136,85 +173,84 @@ your-project/
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
 
+### 🔄 更新插件
+
+当有新版本可用时，执行以下命令：
+
+```bash
+# 卸载旧版本
+/plugin uninstall code-documents-auto@code-documents-auto-skill
+
+# 清除缓存（可选但推荐）
+rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
+
+# 重新安装最新版本
+/plugin install code-documents-auto@code-documents-auto-skill
+```
+
 ### 🎮 使用方法
+
+#### 指令概览
+
+| 指令 | 说明 | 使用场景 |
+|------|------|----------|
+| `/docs-scan` | 全量扫描，生成完整文档 | 首次使用、重大重构后 |
+| `/docs-scan --update` | 增量更新，只更新变更部分 | 日常开发后 |
+| `/code-documents-auto <任务>` | 读取模式，输出开发方案 | 开始新任务前 |
+| `/code-documents-auto 归档` | 归档模式，更新文档 | 开发完成后 |
+
+#### 首次使用
+
+```
+/docs-scan
+```
 
 #### 开发前
 
-告诉 AI 你要做什么：
-
 ```
 /code-documents-auto 加跨域请求配置
-/code-documents-auto 修改登录功能，添加记住密码
-/code-documents-auto 修复认证模块的 bug
-/code-documents-auto 重构数据库层
+/code-documents-auto 修复登录 bug
 ```
-
-AI 会自动：
-1. 解析任务描述
-2. 查找并读取所有相关文档
-3. 展示读取摘要
 
 #### 开发后
 
-告诉 AI 你完成了：
-
 ```
 /code-documents-auto 开发完了，归档
-/code-documents-auto 改完了
-/code-documents-auto 完成
-/code-documents-auto 归档
 ```
-
-AI 会自动：
-1. 检测修改的文件
-2. 生成变更记录
-3. 更新模块文档
-4. 展示归档摘要
 
 ### 📁 文件结构
 
 ```
-your-project/
-├── 📂 .ai-context/
-│   ├── 📄 README.md              # 📋 项目概览
-│   ├── 📄 architecture.md        # 🏗️ 系统架构
-│   ├── 📂 guidelines/            # 📏 编码规范
-│   ├── 📂 modules/               # 📦 模块文档
-│   ├── 📂 features/              # ✨ 功能文档
-│   ├── 📂 api/                   # 🔌 API 文档
-│   ├── 📂 changelog/             # 📝 变更历史
-│   └── 📂 decisions/             # 🤔 决策记录
-├── 📄 CLAUDE.md                   # 🤖 AI 规则
-└── 📄 AGENTS.md                   # 🎯 Agent 规则
+项目根目录/
+├── CLAUDE.md                        # 工作流规则
+├── AGENTS.md                        # AI Agent 行为规则
+└── .ai-context/
+    ├── README.md                    # 项目概览
+    ├── architecture.md              # 系统架构
+    ├── modules/                     # 模块文档
+    ├── api/                         # API 文档
+    ├── database/                    # 数据库设计
+    ├── middleware/                   # 中间件使用
+    ├── guidelines/                  # 编码规范
+    ├── changelog/                   # 变更记录
+    └── decisions/                   # 技术决策
 ```
 
-### 🛠️ 命令
-
-| 命令 | 描述 |
-|------|------|
-| `/code-documents-auto <任务>` | 📖 读取文档 或 📝 归档变更 |
-| `/docs-scan` | 🔍 初始代码库扫描 |
-
 ---
 
-## 📊 Stats
-
-![GitHub Stars](https://img.shields.io/github/stars/trainMini/code-documents-auto-skill?style=social)
-![GitHub Forks](https://img.shields.io/github/forks/trainMini/code-documents-auto-skill?style=social)
-![GitHub Issues](https://img.shields.io/github/issues/trainMini/code-documents-auto-skill)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/trainMini/code-documents-auto-skill)
-
----
-
-## 🤝 Contributing
+## 🤝 Contributing / 贡献
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
+欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
+
 ---
 
-## 📄 License
+## 📄 License / 许可证
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+本项目采用 MIT 许可证 - 详情请查看 [LICENSE](LICENSE) 文件。
 
 ---
 

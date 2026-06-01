@@ -10,30 +10,15 @@
 检查项目:
   - 是否存在 .ai-context/ 目录？
   - 是否存在 CLAUDE.md 文件？
-  - 是否存在 AGENTS.md 文件？
 ```
 
-### 步骤 2：自动设置规则
+### 步骤 2：自动设置
 
 ```yaml
 设置 CLAUDE.md:
   检查: 是否存在文件？
-  检查: 是否包含强制规则？
+  检查: 是否包含工作流规则？
   动作: 如果不存在或缺少规则，自动追加
-
-设置 AGENTS.md:
-  检查: 是否存在文件？
-  检查: 是否包含 Agent 规则？
-  动作: 如果不存在或缺少规则，自动追加
-```
-
-### 步骤 3：自动扫描代码库
-
-```yaml
-扫描代码库:
-  检查: 是否存在 .ai-context/ 目录？
-  动作: 如果不存在，自动运行 /docs-scan
-  结果: 生成完整的文档结构
 ```
 
 **用户不需要执行任何手动操作，AI 会自动完成所有初始化。**
@@ -67,26 +52,23 @@ AI 根据用户输入判断执行场景：
 **当用户输入开发任务时，AI 必须执行：**
 
 ```yaml
-步骤 1: 解析任务
+步骤 1: 检查文档
+  - 检查 .ai-context/ 是否存在
+  - 如果不存在，提示用户运行 /docs-scan
+
+步骤 2: 解析任务
   - 分析任务描述
   - 识别涉及的模块
   - 识别涉及的功能
 
-步骤 2: 查找文档
-  必查目录:
-    - .ai-context/modules/
-    - .ai-context/features/
-    - .ai-context/api/
-
 步骤 3: 读取文档
   必读文档:
     - .ai-context/architecture.md
-    - .ai-context/guidelines/README.md
-    - .ai-context/modules/{module}/README.md
-  
+    - .ai-context/guidelines/coding-style.md
+
   条件读取:
-    - .ai-context/features/{feature}/README.md（如果存在）
-    - .ai-context/api/{api}/README.md（如果存在）
+    - .ai-context/modules/{module}.md（如果存在）
+    - .ai-context/api/{api}.md（如果存在）
 
 步骤 4: 输出摘要
   - 列出已读取的文档
@@ -100,7 +82,7 @@ AI 根据用户输入判断执行场景：
 
 ```yaml
 步骤 1: 检测变更
-  - 扫描修改的文件
+  - 使用 git diff 扫描修改的文件
   - 识别涉及的模块
 
 步骤 2: 生成记录
@@ -113,9 +95,8 @@ AI 根据用户输入判断执行场景：
 
 步骤 3: 更新文档
   更新文件:
-    - .ai-context/modules/{module}/README.md
-    - .ai-context/features/{feature}/README.md（如果存在）
-    - .ai-context/api/{api}/README.md（如果存在）
+    - .ai-context/modules/{module}.md（如果存在）
+    - .ai-context/api/{api}.md（如果存在）
 
 步骤 4: 输出摘要
   - 列出已更新的文档
@@ -165,18 +146,16 @@ AI 根据用户输入判断执行场景：
 ## 常见用法
 
 ```bash
+# 首次使用
+/docs-scan
+
 # 开发前
 /code-documents-auto 加跨域请求配置
 /code-documents-auto 修改登录功能，添加记住密码
 /code-documents-auto 修复认证模块的 bug
-/code-documents-auto 重构数据库层
 
 # 开发后
 /code-documents-auto 开发完了，归档
 /code-documents-auto 改完了
 /code-documents-auto 完成
-/code-documents-auto 归档
-
-# 首次使用
-/docs-scan
 ```

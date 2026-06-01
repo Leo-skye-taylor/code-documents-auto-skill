@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Automatic code documentation management skills for Claude Code",
-    "version": "1.0.0"
+    "version": "3.0.0"
   },
   "plugins": [
     {
@@ -15,8 +15,8 @@
         "source": "url",
         "url": "https://github.com/trainMini/code-documents-auto-skill.git"
       },
-      "description": "Force AI to read and archive documentation before/after code changes",
-      "version": "1.0.0",
+      "description": "AI-driven code documentation management skill for Claude Code",
+      "version": "3.0.0",
       "strict": true
     }
   ]

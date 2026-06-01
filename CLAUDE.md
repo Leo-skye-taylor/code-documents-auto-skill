@@ -1,4 +1,4 @@
-# CLAUDE.md - Skill 工作流规则
+# CLAUDE.md - 工作流规则
 
 ## 核心原则
 
@@ -11,16 +11,10 @@
 1. **检查项目状态**
    - 检查是否存在 `.ai-context/` 目录
    - 检查是否存在 `CLAUDE.md` 文件
-   - 检查是否存在 `AGENTS.md` 文件
 
 2. **自动设置规则**
-   - 如果 `CLAUDE.md` 不存在，创建并追加强制规则
-   - 如果 `CLAUDE.md` 存在但没有强制规则，追加规则
-   - 如果 `AGENTS.md` 不存在，创建并追加 Agent 规则
-   - 如果 `AGENTS.md` 存在但没有 Agent 规则，追加规则
-
-3. **自动扫描代码库**
-   - 如果 `.ai-context/` 不存在，运行 `/docs-scan` 生成文档
+   - 如果 `CLAUDE.md` 不存在，创建并追加工作流规则
+   - 如果 `.ai-context/` 不存在，提示用户运行 `/docs-scan`
 
 **用户不需要执行任何手动操作，AI 会自动完成所有初始化。**
 
@@ -36,19 +30,22 @@
 
 **当用户输入开发任务时，AI 必须：**
 
-1. **解析任务描述**
+1. **检查文档是否存在**
+   - 检查 `.ai-context/` 目录是否存在
+   - 如果不存在，提示用户先运行 `/docs-scan`
+
+2. **解析任务描述**
    - 识别涉及的模块
    - 识别涉及的功能
    - 识别可能涉及的文件
 
-2. **自动读取相关文档**
+3. **自动读取相关文档**
    - 读取架构文档：`.ai-context/architecture.md`
-   - 读取编码规范：`.ai-context/guidelines/README.md`
-   - 读取模块文档：`.ai-context/modules/[模块名]/README.md`
-   - 读取功能文档：`.ai-context/features/[功能名]/README.md`（如果存在）
-   - 读取 API 文档：`.ai-context/api/[API名]/README.md`（如果存在）
+   - 读取编码规范：`.ai-context/guidelines/coding-style.md`
+   - 读取模块文档：`.ai-context/modules/[模块名].md`
+   - 读取 API 文档：`.ai-context/api/[API名].md`
 
-3. **输出读取摘要**
+4. **输出读取摘要**
    - 列出已读取的文档
    - 总结关键信息
    - 提示用户可以开始开发
@@ -58,7 +55,7 @@
 **当用户表示开发完成时，AI 必须：**
 
 1. **检测变更**
-   - 扫描修改的文件
+   - 使用 `git diff` 扫描修改的文件
    - 识别涉及的模块
 
 2. **生成变更记录**
@@ -66,9 +63,8 @@
    - 包含变更描述、修改文件列表、影响分析
 
 3. **更新相关文档**
-   - 更新模块文档：`.ai-context/modules/[模块名]/README.md`
-   - 更新功能文档：`.ai-context/features/[功能名]/README.md`（如果存在）
-   - 更新 API 文档：`.ai-context/api/[API名]/README.md`（如果存在）
+   - 更新模块文档：`.ai-context/modules/[模块名].md`
+   - 更新 API 文档：`.ai-context/api/[API名].md`
 
 4. **输出归档摘要**
    - 列出已更新的文档
@@ -91,10 +87,11 @@
 用户：/code-documents-auto 加跨域请求配置
 
 AI 必须执行：
-1. 解析任务 → 识别涉及 "跨域"、"配置"、"请求" 相关模块
-2. 查找文档 → .ai-context/modules/config/, .ai-context/api/ 等
-3. 读取文档 → 读取所有相关文档
-4. 输出摘要 → "已读取以下文档：..."
+1. 检查 .ai-context/ 是否存在
+2. 解析任务 → 识别涉及 "跨域"、"配置"、"请求" 相关模块
+3. 查找文档 → .ai-context/modules/config/, .ai-context/api/ 等
+4. 读取文档 → 读取所有相关文档
+5. 输出摘要 → "已读取以下文档：..."
 ```
 
 ### 示例 2：开发后归档
@@ -103,7 +100,7 @@ AI 必须执行：
 用户：/code-documents-auto 开发完了，归档
 
 AI 必须执行：
-1. 检测变更 → 扫描修改的文件
+1. 检测变更 → git diff 扫描修改的文件
 2. 生成记录 → 创建 changelog
 3. 更新文档 → 更新相关模块文档
 4. 输出摘要 → "已归档以下变更：..."
@@ -127,9 +124,13 @@ AI 必须执行：
 ├── README.md                    # 项目概览
 ├── architecture.md              # 系统架构
 ├── guidelines/                  # 编码规范
+│   └── coding-style.md
 ├── modules/                     # 模块文档
-├── features/                    # 功能文档
+│   ├── {模块1}.md
+│   └── {模块2}.md
 ├── api/                         # API 文档
+│   ├── {API1}.md
+│   └── {API2}.md
 ├── changelog/                   # 变更记录
 └── decisions/                   # 决策记录
 ```

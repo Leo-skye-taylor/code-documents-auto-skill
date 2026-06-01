@@ -82,7 +82,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Examples:**
 ```
-feat(hooks): add pre-edit validation
+feat(skill): add new command support
 fix(archive): correct changelog filename
 docs(readme): update installation guide
 ```
@@ -91,11 +91,10 @@ docs(readme): update installation guide
 
 Before submitting:
 
-1. Test hooks manually
-2. Verify workflow works end-to-end
-3. Check for syntax errors:
+1. Verify workflow works end-to-end
+2. Check for syntax errors:
    ```bash
-   shellcheck hooks/*.sh scripts/*.sh
+   shellcheck scripts/*.sh
    ```
 
 ### Pull Request Guidelines
@@ -190,7 +189,7 @@ Open an [issue](https://github.com/trainMini/code-documents-auto-skill/issues) o
 
 **示例：**
 ```
-feat(hooks): 添加预编辑验证
+feat(skill): 添加新命令支持
 fix(archive): 修复 changelog 文件名
 docs(readme): 更新安装指南
 ```
@@ -199,11 +198,10 @@ docs(readme): 更新安装指南
 
 提交前：
 
-1. 手动测试 hooks
-2. 验证端到端工作流
-3. 检查语法错误：
+1. 验证端到端工作流
+2. 检查语法错误：
    ```bash
-   shellcheck hooks/*.sh scripts/*.sh
+   shellcheck scripts/*.sh
    ```
 
 ### Pull Request 指南
