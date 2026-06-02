@@ -1,6 +1,6 @@
 # 🚀 Code Documents Auto Skill
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
 
@@ -46,7 +46,14 @@
 | 📖 **Auto Read** | AI reads docs and outputs development plan before coding |
 | 📝 **Auto Archive** | AI summarizes changes and updates all related docs |
 | 🔄 **Incremental Update** | Support incremental updates, only update changed parts |
-| 🚀 **Simple Commands** | Just `/docs-scan` and `/code-documents-auto` |
+| 📊 **Changelog System** | Complete changelog with statistics, history, and dev cycles |
+| 🚀 **Multiple Commands** | `/docs-scan`, `/docs-scan-update`, and `/code-documents-auto` |
+
+### 🆕 What's New in 3.1.0
+
+- **Independent Command Registration**: `/docs-scan` and `/docs-scan-update` are now standalone commands
+- **Changelog Folder Structure**: Each change generates a separate folder with 6 core documents
+- **User Document Archiving**: Support archiving requirements docs, technical docs, and test reports in changelog
 
 ### 📦 Installation
 
@@ -80,7 +87,7 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 | Command | Description | Use Case |
 |---------|-------------|----------|
 | `/docs-scan` | Full scan, generate all docs | First time, after major refactor |
-| `/docs-scan --update` | Incremental update | After daily development |
+| `/docs-scan-update` | Incremental update | After daily development |
 | `/code-documents-auto <task>` | Read mode, output dev plan | Before starting a task |
 | `/code-documents-auto archive` | Archive mode, update docs | After development |
 
@@ -118,6 +125,21 @@ project-root/
     ├── middleware/                   # Middleware usage
     ├── guidelines/                  # Coding standards
     ├── changelog/                   # Change history
+    │   ├── README.md                # Index (statistics, history list)
+    │   ├── {date}-{name}/           # Each iteration folder
+    │   │   ├── overview.md          # Change overview
+    │   │   ├── files.md             # File list
+    │   │   ├── technical.md         # Technical details
+    │   │   ├── impact.md            # Impact scope
+    │   │   ├── testing.md           # Test verification
+    │   │   ├── deployment.md        # Deployment info
+    │   │   └── docs/                # User-provided docs (optional)
+    │   │       ├── requirements/    # Requirements docs
+    │   │       ├── technical/       # Technical docs
+    │   │       ├── testing/         # Test reports
+    │   │       ├── design/          # Design docs
+    │   │       └── other/           # Other docs
+    │   └── dev-cycles/              # Development cycle records (optional)
     └── decisions/                   # Decision records
 ```
 
@@ -161,7 +183,14 @@ project-root/
 | 📖 **自动读取** | 编码前 AI 自动读取文档并输出开发方案 |
 | 📝 **自动归档** | AI 总结变更并更新所有相关文档 |
 | 🔄 **增量更新** | 支持增量更新，只更新变更部分 |
-| 🚀 **简单指令** | 只需 `/docs-scan` 和 `/code-documents-auto` |
+| 📊 **变更记录系统** | 完整的变更记录，包含统计、历史和开发周期 |
+| 🚀 **多指令支持** | `/docs-scan`、`/docs-scan-update` 和 `/code-documents-auto` |
+
+### 🆕 3.1.0 版本更新
+
+- **独立命令注册**：`/docs-scan` 和 `/docs-scan-update` 现在是独立命令
+- **Changelog 文件夹结构**：每次变更生成独立文件夹，包含 6 个核心文档
+- **用户文档归档**：支持在 changelog 中归档需求文档、技术文档、测试报告
 
 ### 📦 安装步骤
 
@@ -195,7 +224,7 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 | 指令 | 说明 | 使用场景 |
 |------|------|----------|
 | `/docs-scan` | 全量扫描，生成完整文档 | 首次使用、重大重构后 |
-| `/docs-scan --update` | 增量更新，只更新变更部分 | 日常开发后 |
+| `/docs-scan-update` | 增量更新，只更新变更部分 | 日常开发后 |
 | `/code-documents-auto <任务>` | 读取模式，输出开发方案 | 开始新任务前 |
 | `/code-documents-auto 归档` | 归档模式，更新文档 | 开发完成后 |
 
@@ -233,6 +262,21 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
     ├── middleware/                   # 中间件使用
     ├── guidelines/                  # 编码规范
     ├── changelog/                   # 变更记录
+    │   ├── README.md                # 总索引（变更统计、历史列表）
+    │   ├── {日期}-{标识}/           # 每次迭代的文件夹
+    │   │   ├── overview.md          # 变更概述
+    │   │   ├── files.md             # 文件清单
+    │   │   ├── technical.md         # 技术细节
+    │   │   ├── impact.md            # 影响范围
+    │   │   ├── testing.md           # 测试验证
+    │   │   ├── deployment.md        # 部署信息
+    │   │   └── docs/                # 用户提供的文档（可选）
+    │   │       ├── requirements/    # 需求文档
+    │   │       ├── technical/       # 技术文档
+    │   │       ├── testing/         # 测试报告
+    │   │       ├── design/          # 设计文档
+    │   │       └── other/           # 其他文档
+    │   └── dev-cycles/              # 开发周期记录（可选）
     └── decisions/                   # 技术决策
 ```
 
