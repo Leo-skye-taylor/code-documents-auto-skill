@@ -12,7 +12,7 @@ Thank you for your interest in contributing to Code Documents Auto Skill! 🎉
 
 #### 🐛 Report Bugs
 
-1. Check [existing issues](https://github.com/trainMini/code-documents-auto-skill/issues) first
+1. Check [existing issues](https://github.com/Leo-skye-taylor/code-documents-auto-skill/issues) first
 2. Create a new issue with:
    - Clear title
    - Steps to reproduce
@@ -21,7 +21,7 @@ Thank you for your interest in contributing to Code Documents Auto Skill! 🎉
 
 #### 💡 Suggest Features
 
-1. Open a [discussion](https://github.com/trainMini/code-documents-auto-skill/discussions)
+1. Open a [discussion](https://github.com/Leo-skye-taylor/code-documents-auto-skill/discussions)
 2. Describe the feature and use case
 3. Wait for feedback before implementing
 
@@ -107,7 +107,7 @@ Before submitting:
 
 ### Questions?
 
-Open an [issue](https://github.com/trainMini/code-documents-auto-skill/issues) or start a [discussion](https://github.com/trainMini/code-documents-auto-skill/discussions).
+Open an [issue](https://github.com/Leo-skye-taylor/code-documents-auto-skill/issues) or start a [discussion](https://github.com/Leo-skye-taylor/code-documents-auto-skill/discussions).
 
 ---
 
@@ -119,7 +119,7 @@ Open an [issue](https://github.com/trainMini/code-documents-auto-skill/issues) o
 
 #### 🐛 报告 Bug
 
-1. 先查看[已有 Issues](https://github.com/trainMini/code-documents-auto-skill/issues)
+1. 先查看[已有 Issues](https://github.com/Leo-skye-taylor/code-documents-auto-skill/issues)
 2. 创建新 Issue，包含：
    - 清晰的标题
    - 复现步骤
@@ -128,7 +128,7 @@ Open an [issue](https://github.com/trainMini/code-documents-auto-skill/issues) o
 
 #### 💡 建议功能
 
-1. 开启[讨论](https://github.com/trainMini/code-documents-auto-skill/discussions)
+1. 开启[讨论](https://github.com/Leo-skye-taylor/code-documents-auto-skill/discussions)
 2. 描述功能和使用场景
 3. 等待反馈后再实现
 
@@ -214,7 +214,7 @@ docs(readme): 更新安装指南
 
 ### 有问题？
 
-创建 [Issue](https://github.com/trainMini/code-documents-auto-skill/issues) 或开启[讨论](https://github.com/trainMini/code-documents-auto-skill/discussions)。
+创建 [Issue](https://github.com/Leo-skye-taylor/code-documents-auto-skill/issues) 或开启[讨论](https://github.com/Leo-skye-taylor/code-documents-auto-skill/discussions)。
 
 ---
 

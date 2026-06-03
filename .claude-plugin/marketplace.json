@@ -1,8 +1,8 @@
 {
   "name": "code-documents-auto-skill",
   "owner": {
-    "name": "trainMini",
-    "email": "trainMini@users.noreply.github.com"
+    "name": "Leo-skye-taylor",
+    "email": "Leo-skye-taylor@users.noreply.github.com"
   },
   "metadata": {
     "description": "Automatic code documentation management skills for Claude Code",
@@ -13,7 +13,7 @@
       "name": "code-documents-auto",
       "source": {
         "source": "url",
-        "url": "https://github.com/trainMini/code-documents-auto-skill.git"
+        "url": "https://github.com/Leo-skye-taylor/code-documents-auto-skill.git"
       },
       "description": "AI-driven code documentation management skill for Claude Code",
       "version": "3.1.0",

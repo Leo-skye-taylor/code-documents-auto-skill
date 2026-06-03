@@ -4,7 +4,7 @@ description: >
   AI 驱动的代码文档管理。用户输入 /docs-scan 扫描代码库，输入 /code-documents-auto 读取或归档文档。
 metadata:
   version: "3.1"
-  author: "trainMini"
+  author: "Leo-skye-taylor"
 ---
 
 # Code Documents Auto Skill

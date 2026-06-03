@@ -1,6 +1,6 @@
 # 🚀 Code Documents Auto Skill
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/trainMini/code-documents-auto-skill)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/Leo-skye-taylor/code-documents-auto-skill)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
 
@@ -59,7 +59,7 @@
 
 ```bash
 # Step 1: Add marketplace
-/plugin marketplace add trainMini/code-documents-auto-skill
+/plugin marketplace add Leo-skye-taylor/code-documents-auto-skill
 
 # Step 2: Install plugin
 /plugin install code-documents-auto@code-documents-auto-skill
@@ -196,7 +196,7 @@ project-root/
 
 ```bash
 # 第一步：添加市场
-/plugin marketplace add trainMini/code-documents-auto-skill
+/plugin marketplace add Leo-skye-taylor/code-documents-auto-skill
 
 # 第二步：安装插件
 /plugin install code-documents-auto@code-documents-auto-skill
@@ -300,8 +300,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Made with ❤️ by [trainMini](https://github.com/trainMini)**
+**Made with ❤️ by [Leo-skye-taylor](https://github.com/Leo-skye-taylor)**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github)](https://github.com/trainMini)
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github)](https://github.com/Leo-skye-taylor)
 
 </div>
