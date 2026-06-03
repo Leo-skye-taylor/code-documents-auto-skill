@@ -1,5 +1,5 @@
 ---
-name: docs-scan-update
+name: docs-update
 description: >
   增量更新文档，只更新变更部分。日常开发后运行，比全量扫描更快。
 user-invocable: true
@@ -10,12 +10,11 @@ allowed-tools:
   - Bash
   - Glob
   - Grep
-  - Agent
 ---
 
-# /docs-scan-update — 增量更新文档
+# /docs-update — 增量更新文档
 
-**当用户输入 `/docs-scan-update` 时，你必须执行增量更新流程：**
+**当用户输入 `/docs-update` 时，执行增量更新流程：**
 
 ## 前置检查
 

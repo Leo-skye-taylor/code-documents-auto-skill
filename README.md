@@ -1,6 +1,6 @@
 # 🚀 Code Documents Auto Skill
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/Leo-skye-taylor/code-documents-auto-skill)
+[![Version](https://img.shields.io/badge/version-3.1.1-blue.svg)](https://github.com/Leo-skye-taylor/code-documents-auto-skill)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
 
@@ -24,13 +24,13 @@
 │      ↓                                                      │
 │  🤖 AI scans codebase and generates documentation           │
 │      ↓                                                      │
-│  User: "/code-documents-auto add login feature"             │
+│  User: "/docs-prepare add login feature"                       │
 │      ↓                                                      │
 │  📖 AI reads related docs and outputs development plan      │
 │      ↓                                                      │
 │  💻 User implements the feature                             │
 │      ↓                                                      │
-│  User: "/code-documents-auto done, archive"                 │
+│  User: "/docs-archive"                                      │
 │      ↓                                                      │
 │  📝 AI summarizes & updates all related docs                │
 │      ↓                                                      │
@@ -47,13 +47,13 @@
 | 📝 **Auto Archive** | AI summarizes changes and updates all related docs |
 | 🔄 **Incremental Update** | Support incremental updates, only update changed parts |
 | 📊 **Changelog System** | Complete changelog with statistics, history, and dev cycles |
-| 🚀 **Multiple Commands** | `/docs-scan`, `/docs-scan-update`, and `/code-documents-auto` |
+| 🚀 **Multiple Commands** | `/docs-scan`, `/docs-update`, `/docs-prepare`, `/docs-archive` |
 
-### 🆕 What's New in 3.1.0
+### 🆕 What's New in 3.1.1
 
-- **Independent Command Registration**: `/docs-scan` and `/docs-scan-update` are now standalone commands
-- **Changelog Folder Structure**: Each change generates a separate folder with 6 core documents
-- **User Document Archiving**: Support archiving requirements docs, technical docs, and test reports in changelog
+- **Smart Assistant**: `/docs <description>` - AI automatically detects intent and executes the appropriate workflow
+- **Bug Analysis**: Built-in bug detection and analysis capabilities
+- **Unified Command**: One command to handle all scenarios - development, bug finding, archiving, scanning, updating
 
 ### 📦 Installation
 
@@ -86,10 +86,11 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 
 | Command | Description | Use Case |
 |---------|-------------|----------|
+| `/docs <描述>` | Smart assistant, auto-detect intent | Any scenario |
 | `/docs-scan` | Full scan, generate all docs | First time, after major refactor |
-| `/docs-scan-update` | Incremental update | After daily development |
-| `/code-documents-auto <task>` | Read mode, output dev plan | Before starting a task |
-| `/code-documents-auto archive` | Archive mode, update docs | After development |
+| `/docs-update` | Incremental update | After daily development |
+| `/docs-prepare <task>` | Pre-development, output dev plan | Before starting a task |
+| `/docs-archive` | Archive mode, update docs | After development |
 
 #### First Time Setup
 
@@ -100,14 +101,14 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 #### Before Development
 
 ```
-/code-documents-auto add cross-origin configuration
-/code-documents-auto fix login bug
+/docs-prepare add cross-origin configuration
+/docs-prepare fix login bug
 ```
 
 #### After Development
 
 ```
-/code-documents-auto done, archive
+/docs-archive
 ```
 
 ### 📁 File Structure
@@ -161,13 +162,13 @@ project-root/
 │      ↓                                                       │
 │  🤖 AI 扫描代码库并生成文档                                    │
 │      ↓                                                       │
-│  用户: "/code-documents-auto 添加登录功能"                     │
+│  用户: "/docs-prepare 添加登录功能"                               │
 │      ↓                                                       │
 │  📖 AI 自动读取相关文档并输出开发方案                            │
 │      ↓                                                       │
 │  💻 用户实现功能                                               │
 │      ↓                                                       │
-│  用户: "/code-documents-auto 开发完了，归档"                    │
+│  用户: "/docs-archive"                                        │
 │      ↓                                                       │
 │  📝 AI 总结变更并更新所有相关文档                                │
 │      ↓                                                       │
@@ -184,13 +185,13 @@ project-root/
 | 📝 **自动归档** | AI 总结变更并更新所有相关文档 |
 | 🔄 **增量更新** | 支持增量更新，只更新变更部分 |
 | 📊 **变更记录系统** | 完整的变更记录，包含统计、历史和开发周期 |
-| 🚀 **多指令支持** | `/docs-scan`、`/docs-scan-update` 和 `/code-documents-auto` |
+| 🚀 **多指令支持** | `/docs-scan`、`/docs-update`、`/docs-prepare`、`/docs-archive` |
 
-### 🆕 3.1.0 版本更新
+### 🆕 3.1.1 版本更新
 
-- **独立命令注册**：`/docs-scan` 和 `/docs-scan-update` 现在是独立命令
-- **Changelog 文件夹结构**：每次变更生成独立文件夹，包含 6 个核心文档
-- **用户文档归档**：支持在 changelog 中归档需求文档、技术文档、测试报告
+- **智能助手**：`/docs <描述>` - AI 自动识别意图，执行对应的 workflow
+- **Bug 分析**：内置 Bug 检测和分析能力
+- **统一命令**：一个命令处理所有场景 - 开发、找Bug、归档、扫描、更新
 
 ### 📦 安装步骤
 
@@ -223,10 +224,11 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 
 | 指令 | 说明 | 使用场景 |
 |------|------|----------|
+| `/docs <描述>` | 智能助手，自动识别意图 | 任何场景 |
 | `/docs-scan` | 全量扫描，生成完整文档 | 首次使用、重大重构后 |
-| `/docs-scan-update` | 增量更新，只更新变更部分 | 日常开发后 |
-| `/code-documents-auto <任务>` | 读取模式，输出开发方案 | 开始新任务前 |
-| `/code-documents-auto 归档` | 归档模式，更新文档 | 开发完成后 |
+| `/docs-update` | 增量更新，只更新变更部分 | 日常开发后 |
+| `/docs-prepare <任务>` | 开发前准备，输出开发方案 | 开始新任务前 |
+| `/docs-archive` | 归档模式，更新文档 | 开发完成后 |
 
 #### 首次使用
 
@@ -237,14 +239,14 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 #### 开发前
 
 ```
-/code-documents-auto 加跨域请求配置
-/code-documents-auto 修复登录 bug
+/docs-prepare 加跨域请求配置
+/docs-prepare 修复登录 bug
 ```
 
 #### 开发后
 
 ```
-/code-documents-auto 开发完了，归档
+/docs-archive
 ```
 
 ### 📁 文件结构

@@ -20,11 +20,15 @@
 
 ## Skill 指令驱动工作流
 
-### 指令格式
+### 可用指令
 
-```
-/code-documents-auto <任务描述>
-```
+| 指令 | 说明 | 使用场景 |
+|------|------|----------|
+| `/docs <描述>` | 智能助手，自动识别意图 | 任何场景 |
+| `/docs-scan` | 全量扫描，生成完整文档 | 首次使用、重大重构后 |
+| `/docs-update` | 增量更新，只更新变更部分 | 日常开发后 |
+| `/docs-prepare <任务>` | 开发前准备，输出开发方案 | 开始新任务前 |
+| `/docs-archive` | 归档模式，更新文档 | 开发完成后 |
 
 ### 规则 1：开发前必须读取文档
 
@@ -77,14 +81,14 @@
 
 - ❌ 跳过文档读取直接编辑代码
 - ❌ 跳过文档归档直接结束工作
-- ❌ 忽略用户的 `/code-documents-auto` 指令
+- ❌ 忽略用户的 `/docs-prepare` 或 `/docs-archive` 指令
 
 ## 指令场景示例
 
 ### 示例 1：开发前读取
 
 ```
-用户：/code-documents-auto 加跨域请求配置
+用户：/docs-prepare 加跨域请求配置
 
 AI 必须执行：
 1. 检查 .ai-context/ 是否存在
@@ -97,7 +101,7 @@ AI 必须执行：
 ### 示例 2：开发后归档
 
 ```
-用户：/code-documents-auto 开发完了，归档
+用户：/docs-archive
 
 AI 必须执行：
 1. 检测变更 → git diff 扫描修改的文件
@@ -109,12 +113,12 @@ AI 必须执行：
 ### 示例 3：多模块变更
 
 ```
-用户：/code-documents-auto 修改用户登录和权限验证功能
+用户：/docs-prepare 修改用户登录和权限验证功能
 
 AI 必须执行：
 1. 读取相关文档
 2. 用户开发
-3. 归档变更
+3. /docs-archive 归档变更
 ```
 
 ## 文档结构
@@ -140,23 +144,26 @@ AI 必须执行：
 ### 读取文档指令
 
 ```
-/code-documents-auto <任务描述>
+/docs-prepare <任务描述>
 ```
 
 示例：
 ```
-/code-documents-auto 加跨域请求配置
-/code-documents-auto 修改登录功能
-/code-documents-auto 修复认证 bug
+/docs-prepare 加跨域请求配置
+/docs-prepare 修改登录功能
+/docs-prepare 修复认证 bug
 ```
 
 ### 归档指令
 
 ```
-/code-documents-auto 开发完了，归档
-/code-documents-auto 改完了
-/code-documents-auto 完成
-/code-documents-auto 归档
+/docs-archive
+```
+
+### 增量更新指令
+
+```
+/docs-update
 ```
 
 ### 初始扫描
