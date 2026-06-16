@@ -1,7 +1,7 @@
 ---
 name: code-documents-auto
 description: >
-  AI 驱动的代码文档管理。包含 4 个独立指令。
+  AI 驱动的代码文档管理。包含 5 个独立指令。
 user-invocable: true
 allowed-tools:
   - Read
@@ -13,7 +13,7 @@ allowed-tools:
   - Agent
   - WebFetch
 metadata:
-  version: "3.1"
+  version: "3.1.2"
   author: "Leo-skye-taylor"
 ---
 
@@ -28,6 +28,7 @@ metadata:
 | `/docs <描述>` | 智能助手，自动识别意图 | 任何场景 |
 | `/docs-scan` | 全量扫描，生成完整文档 | 首次使用、重大重构后 |
 | `/docs-update` | 增量更新，只更新变更部分 | 日常开发后 |
+| `/docs-check` | 检测文档结构，发现问题自动迁移 | 升级插件版本后 |
 | `/docs-prepare <任务>` | 开发前准备，输出开发方案 | 开始新任务前 |
 | `/docs-archive` | 归档模式，更新文档 | 开发完成后 |
 
@@ -48,6 +49,7 @@ metadata:
 | 归档变更 | "完成"、"归档"、"提交"、"结束"、"搞定"、"做完" | → 执行 /docs-archive 流程 |
 | 全量扫描 | "扫描"、"初始化"、"生成文档"、"第一次" | → 执行 /docs-scan 流程 |
 | 增量更新 | "更新"、"同步"、"增量" | → 执行 /docs-update 流程 |
+| 检测文档结构 | "检测文档"、"检查文档"、"旧格式"、"升级文档"、"迁移"、"转换"、"结构是否最新"、"文档是否过时"、"升级到最新" | → 执行 /docs-check 流程（自动迁移） |
 
 ### Bug 分析流程
 
@@ -146,6 +148,49 @@ find . -maxdepth 3 -type d \
 | go.mod | Go |
 | Cargo.toml | Rust |
 
+### 第二步半：判断项目分类
+
+在识别项目类型后，**进一步判断项目分类**，决定是否需要生成数据库和中间件文档：
+
+| 项目分类 | 识别规则 | 文档范围 |
+|----------|----------|----------|
+| **纯前端** | 仅包含前端框架（react/vue/angular/svelte/next/nuxt/sveltekit/solid-js/preact），无后端框架（express/koa/fastify/nestjs/egg），无数据库依赖 | 跳过 database/ 和 middleware/ 文档 |
+| **纯后端** | 仅包含后端框架，无前端框架 | 生成所有文档 |
+| **全栈** | 同时包含前端和后端框架 | 生成所有文档 |
+| **库/工具** | 仅包含工具库，无 UI 框架 | 跳过 database/，按需生成 middleware/ |
+| **桌面/移动** | 包含 electron/tauri/react-native/uniapp/ionic | 跳过 database/ 和 middleware/（按需） |
+
+**前端框架识别（满足任一即为前端项目）：**
+
+| 框架 | 识别特征（package.json dependencies） |
+|------|--------------------------------------|
+| React | `react`, `react-dom` |
+| Vue | `vue`, `nuxt` |
+| Angular | `@angular/core` |
+| Svelte | `svelte`, `@sveltejs/kit` |
+| Solid | `solid-js` |
+| Preact | `preact` |
+| Next.js | `next` |
+| Remix | `@remix-run/react` |
+
+**数据库依赖识别（无以下依赖 = 无数据库）：**
+
+`mysql`, `mysql2`, `pg`, `mongoose`, `sequelize`, `prisma`, `typeorm`, `knex`, `mongodb`, `redis`, `ioredis`, `drizzle-orm`
+
+**后端服务依赖识别（无以下依赖 = 无后端服务）：**
+
+`express`, `koa`, `fastify`, `@nestjs/core`, `egg`, `hapi`, `restify`, `polka`, `micro`
+
+**判定结果记录：**
+
+将项目分类记录到扫描上下文中，后续步骤根据分类决定是否执行：
+
+```
+项目分类：{纯前端/纯后端/全栈/库/桌面移动}
+是否生成 database/ 文档：{是/否}
+是否生成 middleware/ 文档：{是/否}
+```
+
 ### 第三步：读取关键文件
 
 根据项目类型，读取以下文件：
@@ -190,6 +235,10 @@ find . -maxdepth 3 -type d \
 - 依赖什么其他模块
 
 ### 第五步：分析数据库模块
+
+**⚠️ 条件执行**：仅当第二步半判定"是否生成 database/ 文档"为**是**时执行此步骤。
+
+**如果是纯前端项目且无数据库依赖，跳过此步骤。**
 
 **识别数据库类型和配置：**
 
@@ -266,6 +315,10 @@ find . -maxdepth 3 -type d \
 ```
 
 ### 第六步：分析中间件使用
+
+**⚠️ 条件执行**：仅当第二步半判定"是否生成 middleware/ 文档"为**是**时执行此步骤。
+
+**如果是纯前端项目且无后端服务依赖，跳过此步骤。**
 
 **识别中间件类型：**
 
@@ -1428,9 +1481,15 @@ describe('{模块名}', () => {
 
 ## 变更历史
 
-| 日期 | 标题 | 类型 | 模块 | 作者 | 状态 | 详情 |
-|------|------|------|------|------|------|------|
-| {日期} | {标题} | {类型} | {模块} | {作者} | {状态} | [查看](./{文件夹名}/) |
+> ⚠️ **重要**："标题"列必须填写**具体变更标题**（如"添加用户登录功能"），不能只填类型（feat/fix）。
+> "描述"列填写本次变更的简要说明。
+
+| 日期 | 标题 | 描述 | 类型 | 模块 | 作者 | 状态 | 详情 |
+|------|------|------|------|------|------|------|------|
+| 2026-06-16 | 添加智能助手命令 | 新增 /docs 统一入口，自动识别用户意图 | feat | commands | AI | done | [查看](./2026-06-16-143000-smart-assistant/) |
+| 2026-06-16 | 重命名 docs-read 命令 | 改为 docs-prepare，更符合"开发前准备"语义 | chore | commands | AI | done | [查看](./2026-06-16-150000-rename-docs-prepare/) |
+| 2026-06-15 | 修复登录 token 过期问题 | 延长 JWT 过期时间至 24h | fix | auth | zhangsan | done | [查看](./2026-06-15-103000-fix-token-expiry/) |
+| {日期} | {具体变更标题} | {变更详细说明} | {feat/fix/refactor/docs/chore/perf/test/ci} | {模块} | {作者} | {done/in-progress/reverted} | [查看](./{文件夹名}/) |
 
 ## 按模块统计
 
@@ -1456,21 +1515,219 @@ describe('{模块名}', () => {
 
 每个迭代文件夹包含以下 6 个文档，以及可选的用户文档：
 
-**用户文档处理：**
+**用户文档处理（docs/ 子目录）：**
 
-如果用户提供了需求文档、技术文档、测试报告等，需要：
+如果用户提供了需求文档、技术文档、测试报告等，按以下规则归档：
 
-1. **创建文档目录**：`.ai-context/changelog/{文件夹名}/docs/`
-2. **按类型存放**：
-   - `docs/requirements/` - 需求文档
-   - `docs/technical/` - 技术文档
-   - `docs/testing/` - 测试报告
-   - `docs/design/` - 设计文档
-   - `docs/other/` - 其他文档
-3. **在对应文档中引用**：
-   - overview.md 中引用需求文档
-   - technical.md 中引用技术文档
-   - testing.md 中引用测试报告
+| 子目录 | 用途 | 典型文件 | 模板路径 |
+|--------|------|----------|----------|
+| `docs/requirements/` | 需求文档 | PRD、需求规格、用户故事、需求评审纪要 | `docs/requirements/prd.md` |
+| `docs/technical/` | 技术文档 | 技术方案、架构设计、API 设计、数据模型设计 | `docs/technical/tech-design.md` |
+| `docs/testing/` | 测试文档 | 测试用例、测试报告、性能报告、QA 验收单 | `docs/testing/test-report.md` |
+| `docs/design/` | 设计文档 | UI 设计稿、交互流程图、数据库 ER 图、架构图 | `docs/design/ui-mockup.md` |
+| `docs/other/` | 其他参考 | 会议纪要、讨论记录、参考资料、邮件往来 | `docs/other/meeting-notes.md` |
+
+**docs/ 各子目录的文档模板：**
+
+**`docs/requirements/prd.md`（需求文档模板）：**
+
+```markdown
+# {功能名} - 需求文档
+
+> 来源：{PRD/用户反馈/技术债务}
+> 编号：{REQ-2026-001}
+> 优先级：{P0/P1/P2/P3}
+> 创建日期：{YYYY-MM-DD}
+
+## 背景
+
+{为什么需要这个功能}
+
+## 目标用户
+
+{谁会使用这个功能}
+
+## 用户故事
+
+- 作为 {角色}，我希望 {做什么}，以便 {达成什么目的}
+
+## 功能需求
+
+### 必须有（P0）
+
+1. {需求1}
+2. {需求2}
+
+### 应该有（P1）
+
+1. {需求3}
+
+### 可以有（P2）
+
+1. {需求4}
+
+## 验收标准
+
+- [ ] {标准1}
+- [ ] {标准2}
+
+## 非功能需求
+
+- **性能**: {要求}
+- **安全**: {要求}
+- **兼容性**: {要求}
+```
+
+**`docs/technical/tech-design.md`（技术文档模板）：**
+
+```markdown
+# {功能名} - 技术方案
+
+> 作者：{作者}
+> 日期：{YYYY-MM-DD}
+> 状态：{草稿/评审中/已通过}
+
+## 背景
+
+{要解决的技术问题}
+
+## 方案对比
+
+| 方案 | 优点 | 缺点 | 成本 |
+|------|------|------|------|
+| 方案A | {优点} | {缺点} | {预估} |
+| 方案B | {优点} | {缺点} | {预估} |
+
+## 推荐方案
+
+{选择哪个方案，为什么}
+
+## 架构设计
+
+{架构图、模块划分、数据流}
+
+## 接口设计
+
+{API 接口、请求响应格式}
+
+## 数据设计
+
+{数据模型、表结构、索引}
+
+## 风险点
+
+- ⚠️ {风险1}：{应对方案}
+```
+
+**`docs/testing/test-report.md`（测试报告模板）：**
+
+```markdown
+# {功能名} - 测试报告
+
+> 测试人：{QA 名字}
+> 测试日期：{YYYY-MM-DD}
+> 测试环境：{dev/staging/prod}
+
+## 测试范围
+
+{本次测试覆盖的功能范围}
+
+## 测试用例
+
+| 编号 | 模块 | 用例描述 | 预期结果 | 实际结果 | 状态 |
+|------|------|----------|----------|----------|------|
+| TC-001 | {模块} | {描述} | {预期} | {实际} | ✅/❌ |
+
+## 性能测试
+
+| 指标 | 目标 | 实际 | 状态 |
+|------|------|------|------|
+| 响应时间 | {ms} | {ms} | ✅/❌ |
+| 并发数 | {数} | {数} | ✅/❌ |
+
+## Bug 清单
+
+| 编号 | 严重程度 | 描述 | 状态 |
+|------|----------|------|------|
+| BUG-001 | 高/中/低 | {描述} | 已修复/待修复 |
+
+## 测试结论
+
+- **通过率**: {百分比}
+- **是否可发布**: {是/否}
+- **遗留问题**: {问题列表}
+```
+
+**`docs/design/ui-mockup.md`（设计文档模板）：**
+
+```markdown
+# {功能名} - 设计稿
+
+> 设计师：{名字}
+> 日期：{YYYY-MM-DD}
+> 工具：{Figma/Sketch/PS}
+
+## 设计稿
+
+- 链接：{Figma URL}
+- 原型：{原型 URL}
+
+## 设计规范
+
+### 颜色
+
+| 用途 | 色值 |
+|------|------|
+| 主色 | {#hex} |
+| 辅助色 | {#hex} |
+
+### 字体
+
+| 用途 | 字体 | 字号 |
+|------|------|------|
+| 标题 | {字体} | {px} |
+| 正文 | {字体} | {px} |
+
+## 交互说明
+
+### 流程图
+
+```
+{流程图}
+```
+
+### 异常状态
+
+- {状态1}：{处理方式}
+```
+
+**`docs/other/meeting-notes.md`（其他文档模板）：**
+
+```markdown
+# {会议/讨论主题} - 纪要
+
+> 时间：{YYYY-MM-DD HH:MM}
+> 参与人：{人员列表}
+> 记录人：{名字}
+
+## 讨论议题
+
+1. {议题1}
+2. {议题2}
+
+## 决议
+
+1. {决议1}
+2. {决议2}
+
+## 待办
+
+- [ ] {事项} - 负责人：{名字} - 截止：{日期}
+
+## 参考资料
+
+- {链接}
+```
 
 ```
 2026-06-01-143000-add-user-auth/
@@ -2016,6 +2273,336 @@ commit: "{commit hash}"
 | v1.1 | {日期} | {说明} | {作者} |
 ```
 
+**完整填入的 Changelog 示例：**
+
+> 以下是一个完整填入的 changelog 记录示例（以本插件 v3.1.1 为例），展示 AI 应该如何生成实际内容，而不是只有占位符。
+
+**目录结构：**
+
+```
+2026-06-16-143000-smart-assistant/
+├── overview.md
+├── files.md
+├── technical.md
+├── impact.md
+├── testing.md
+├── deployment.md
+└── docs/
+    ├── requirements/
+    │   └── v3.1.1-requirements.md
+    ├── technical/
+    │   └── smart-assistant-design.md
+    ├── testing/
+    │   └── command-validation.md
+    ├── design/
+    │   └── command-naming-comparison.md
+    └── other/
+        └── release-notes.md
+```
+
+**`overview.md`（示例）：**
+
+```markdown
+---
+date: 2026-06-16 14:30:00
+type: feat
+scope: commands
+author: "AI 自动归档"
+status: done
+branch: "master"
+commit: "73784d8"
+---
+
+# 添加智能助手命令
+
+> 新增 /docs 统一入口，自动识别用户意图，支持开发、找Bug、归档、扫描、更新 5 种场景
+
+## 需求背景
+
+### 业务需求
+
+现有 4 个独立命令（/docs-scan、/docs-update、/docs-prepare、/docs-archive）使用门槛较高，新用户经常记不住该用哪个命令。
+
+- **需求来源**: 用户反馈
+- **优先级**: P1
+- **影响用户**: 所有用户
+
+### 问题描述
+
+用户输入"开发登录功能"时，不知道该用 `/docs-prepare` 还是其他命令。
+
+### 技术背景
+
+- **现有实现**: 4 个独立 skill 命令
+- **技术债务**: 无
+
+## 变更内容概述
+
+- [x] 新增 `/docs` 智能助手 skill
+- [x] 支持 5 种意图自动识别
+- [x] 更新 SKILL.md 和 README.md
+
+## 关联信息
+
+- **关联 PR**: #7
+- **GitHub Release**: v3.1.1
+```
+
+**`files.md`（示例）：**
+
+```markdown
+# 文件清单
+
+> 本次变更涉及的所有文件
+
+## 变更统计
+
+| 指标 | 数量 |
+|------|------|
+| 修改文件 | 6 |
+| 新增文件 | 2 |
+| 删除文件 | 1 |
+| 变更行数 | +655/-88 |
+
+## 代码文件
+
+| 文件路径 | 状态 | 模块 | 变更类型 | 说明 |
+|----------|------|------|----------|------|
+| skills/docs/SKILL.md | 新增 | commands | 核心 | 新增智能助手 |
+| .claude-plugin/plugin.json | 修改 | config | 配置 | 版本号更新到 3.1.1 |
+| skills/docs-scan-update/SKILL.md | 删除 | commands | 重构 | 合并到 docs-update |
+
+## 配置文件
+
+| 文件路径 | 状态 | 变更说明 |
+|----------|------|----------|
+| .claude-plugin/marketplace.json | 修改 | 版本号更新 |
+
+## 文档文件
+
+| 文件路径 | 状态 | 变更说明 |
+|----------|------|----------|
+| README.md | 修改 | 更新命令表格和版本说明 |
+| SKILL.md | 修改 | 同步各 skill 内容 |
+| CLAUDE.md | 修改 | 更新指令说明 |
+```
+
+**`technical.md`（示例）：**
+
+```markdown
+# 技术细节
+
+> 本次变更的核心技术实现
+
+## 技术文档
+
+- **文档路径**: [docs/technical/smart-assistant-design.md](./docs/technical/smart-assistant-design.md)
+
+## 架构变更
+
+新增 `/docs` 智能助手作为统一入口，内部根据意图分发给其他 skill。
+
+## 核心代码变更
+
+### 变更点 1：新增 /docs 智能助手
+
+**文件**: `skills/docs/SKILL.md`
+
+**新增意图识别表**：
+
+```yaml
+意图识别:
+  - 开发前准备: 开发/添加/实现/修改/新增/功能/需求
+  - 找 Bug: 找bug/检查/修复/问题/调试/错误/异常
+  - 归档变更: 完成/归档/提交/结束/搞定/做完
+  - 全量扫描: 扫描/初始化/生成文档/第一次
+  - 增量更新: 更新/同步/增量
+```
+
+## 接口变更
+
+- 新增 `/docs <描述>` 命令
+
+## 技术决策
+
+### 决策 1：使用 intent 关键词匹配而非 LLM 分类
+
+**背景**: 需要快速识别用户意图
+
+**备选方案**:
+
+| 方案 | 优点 | 缺点 |
+|------|------|------|
+| 关键词匹配 | 快速、可预测 | 不够灵活 |
+| LLM 分类 | 灵活 | 慢、成本高 |
+
+**最终选择**: 关键词匹配
+
+**选择理由**: 5 种意图的触发词差异明显，关键词匹配即可满足
+```
+
+**`impact.md`（示例）：**
+
+```markdown
+# 影响范围
+
+## 功能影响
+
+| 功能模块 | 影响程度 | 影响说明 |
+|----------|----------|----------|
+| 用户工作流 | 重大 | 新增统一入口，降低使用门槛 |
+| 现有命令 | 无 | 4 个独立命令保留，向后兼容 |
+
+## 性能影响
+
+- **响应时间**: 无变化
+- **内存占用**: 无变化
+
+## 兼容性影响
+
+- **API 兼容性**: 向后兼容
+- **老用户**: 无需迁移
+
+## 风险点
+
+- ⚠️ 意图识别可能误判：用户描述不明确时会触发错误的 workflow
+```
+
+**`testing.md`（示例）：**
+
+```markdown
+# 测试验证
+
+## 测试报告
+
+- **文档路径**: [docs/testing/command-validation.md](./docs/testing/command-validation.md)
+
+## 手动测试
+
+- [x] `/docs 开发登录功能` → 正确触发 /docs-prepare
+- [x] `/docs 找bug` → 正确触发 Bug 分析
+- [x] `/docs 完成` → 正确触发 /docs-archive
+- [x] `/docs 扫描` → 正确触发 /docs-scan
+- [x] `/docs 更新` → 正确触发 /docs-update
+
+## 测试结论
+
+所有 5 种意图的测试用例均通过
+```
+
+**`deployment.md`（示例）：**
+
+```markdown
+# 部署信息
+
+## 部署要求
+
+- 无新依赖
+- 无配置变更
+- 无数据库变更
+
+## 部署步骤
+
+1. 升级到 v3.1.1：`/plugin install code-documents-auto@code-documents-auto-skill`
+2. 验证 `/docs` 命令可用
+
+## 回滚方案
+
+如有问题，可降级到 v3.1.0
+```
+
+**`docs/requirements/v3.1.1-requirements.md`（示例）：**
+
+```markdown
+# v3.1.1 - 智能助手需求
+
+> 来源：用户反馈
+> 优先级：P1
+
+## 背景
+
+现有 4 个独立命令使用门槛高，需要一个统一入口。
+
+## 需求
+
+- 新增 `/docs <描述>` 智能助手
+- 支持 5 种意图自动识别
+- 不影响现有命令的独立使用
+```
+
+**`docs/technical/smart-assistant-design.md`（示例）：**
+
+```markdown
+# 智能助手 - 技术设计
+
+## 方案
+
+使用关键词匹配识别用户意图，匹配后分发到对应 skill。
+
+## 意图识别表
+
+见 SKILL.md 详细列表。
+
+## 关键决策
+
+选择关键词匹配而非 LLM 分类，原因：速度快、成本低、5 种意图触发词差异明显。
+```
+
+**`docs/testing/command-validation.md`（示例）：**
+
+```markdown
+# 命令验证报告
+
+## 测试用例
+
+| 输入 | 预期 | 实际 |
+|------|------|------|
+| /docs 开发登录 | docs-prepare | ✅ |
+| /docs 找bug | Bug 分析 | ✅ |
+| /docs 完成 | docs-archive | ✅ |
+```
+
+**`docs/design/command-naming-comparison.md`（示例）：**
+
+```markdown
+# 命名对比
+
+## docs-read vs docs-prepare
+
+| 名称 | 含义 | 评价 |
+|------|------|------|
+| docs-read | 读取文档 | 不够准确 |
+| docs-prepare | 开发前准备 | ✅ 准确 |
+
+最终采用 docs-prepare。
+```
+
+**`docs/other/release-notes.md`（示例）：**
+
+```markdown
+# v3.1.1 Release Notes
+
+## 新功能
+
+- 智能助手 /docs
+
+## 重命名
+
+- /docs-read → /docs-prepare
+```
+
+---
+
+**关键提示：**
+
+> ⚠️ AI 在生成 changelog 时**必须**：
+> 1. 标题列填写**具体变更标题**（如"添加智能助手命令"），不能只填类型（feat/fix）
+> 2. 描述列填写**具体做了什么**（如"新增 /docs 统一入口，自动识别用户意图"）
+> 3. docs/ 子目录中的文件**只在用户提供了对应文档时生成**，不要凭空捏造
+> 4. 6 个核心文档（overview/files/technical/impact/testing/deployment）**必须全部生成**，内容要基于实际变更
+
+---
+
 **创建开发周期记录模板：**
 
 文件命名：`{YYYY-MM}-{功能名称}.md`
@@ -2125,12 +2712,14 @@ total_files: {涉及文件数}
 - {经验2}
 ```
 
-**创建初始变更记录：**
+**创建初始变更记录（统一为文件夹结构，与后续归档保持一致）：**
 
 首先创建 `changelog/README.md` 索引文件：
 
 ```markdown
 # 变更记录
+
+> 项目所有变更的总索引，按时间倒序排列
 
 ## 变更统计
 
@@ -2143,17 +2732,19 @@ total_files: {涉及文件数}
 | 配置变更 | 0 |
 | 文档更新 | 1 |
 
-## 最近变更
+## 变更历史
 
-| 日期 | 类型 | 标题 | 作者 | 状态 |
-|------|------|------|------|------|
-| {当前日期} | docs | 初始文档生成 | AI 自动扫描 | done |
+> ⚠️ "标题"列必须填写**具体变更标题**（不能只填类型），"描述"列填写变更说明。
+
+| 日期 | 标题 | 描述 | 类型 | 模块 | 作者 | 状态 | 详情 |
+|------|------|------|------|------|------|------|------|
+| {当前日期} | 初始化项目文档 | 首次扫描代码库，生成完整文档体系 | docs | global | AI 自动扫描 | done | [查看](./{YYYY-MM-DD-HHMMSS}-initial-scan/) |
 
 ## 按模块统计
 
 | 模块 | 变更次数 | 最近变更 |
 |------|----------|----------|
-| 全局 | 1 | {当前日期} |
+| global | 1 | {当前日期} |
 
 ## 按类型统计
 
@@ -2162,28 +2753,34 @@ total_files: {涉及文件数}
 | docs | 1 | 100% |
 ```
 
-然后创建初始变更记录 `changelog/{YYYY-MM-DD-HHMMSS}-initial-scan.md`：
+然后创建初始变更文件夹 `changelog/{YYYY-MM-DD-HHMMSS}-initial-scan/`：
+
+```
+{YYYY-MM-DD-HHMMSS}-initial-scan/
+├── overview.md
+├── files.md
+├── technical.md
+├── impact.md
+├── testing.md
+├── deployment.md
+└── docs/                              # 可选，本次扫描通常无用户文档
+```
+
+**`overview.md`：**
 
 ```markdown
 ---
-# 基础信息
-date: {当前日期}
+date: {当前日期 HH:MM:SS}
 type: docs
 scope: global
 author: "AI 自动扫描"
 status: done
-
-# 变更统计
-files_changed: 0
-files_added: {生成的文档数}
-files_deleted: 0
-lines_added: {生成的行数}
-lines_deleted: 0
+branch: "{当前分支}"
 ---
 
-# 初始文档生成
+# 初始化项目文档
 
-> AI 自动扫描代码库并生成完整的项目文档
+> AI 自动扫描代码库并生成完整的项目文档体系
 
 ## 需求背景
 
@@ -2193,6 +2790,7 @@ lines_deleted: 0
 
 - **需求来源**: 初始化项目文档
 - **优先级**: P1
+- **影响用户**: 全部开发人员
 
 ### 技术背景
 
@@ -2203,51 +2801,188 @@ lines_deleted: 0
 
 ## 变更内容
 
-### 生成的文档
-
-| 文档 | 说明 |
-|------|------|
-| README.md | 项目概览 |
-| architecture.md | 系统架构设计 |
-| modules/{模块名}.md | 模块详细文档 |
-| api/{API名}.md | API 接口文档 |
-| database/README.md | 数据库设计 |
-| middleware/README.md | 中间件使用 |
-| guidelines/coding-style.md | 编码规范 |
-| changelog/README.md | 变更索引 |
+- [x] 扫描项目结构
+- [x] 识别项目类型和分类（纯前端/纯后端/全栈/库）
+- [x] 生成 `.ai-context/` 目录下的完整文档
 
 ---
 
-## 影响范围
+## 关联信息
 
-### 功能影响
+- **关联命令**: `/docs-scan`
+```
+
+**`files.md`：**
+
+```markdown
+# 文件清单
+
+> 本次扫描生成的所有文档文件
+
+## 变更统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增文件 | {生成的文档数} |
+| 修改文件 | 0 |
+| 删除文件 | 0 |
+
+## 文档文件
+
+| 文件路径 | 状态 | 说明 |
+|----------|------|------|
+| .ai-context/README.md | 新增 | 项目概览 |
+| .ai-context/architecture.md | 新增 | 系统架构 |
+| .ai-context/modules/{模块名}.md | 新增 | 模块详细文档 |
+| .ai-context/api/{API名}.md | 新增 | API 接口文档（如适用） |
+| .ai-context/database/README.md | 新增 | 数据库设计（如适用） |
+| .ai-context/middleware/README.md | 新增 | 中间件使用（如适用） |
+| .ai-context/guidelines/coding-style.md | 新增 | 编码规范 |
+| .ai-context/changelog/README.md | 新增 | 变更索引 |
+| .ai-context/changelog/{日期}-initial-scan/ | 新增 | 初始扫描记录 |
+| CLAUDE.md | 新建/更新 | 工作流规则 |
+| AGENTS.md | 新建/更新 | AI Agent 行为规则 |
+```
+
+**`technical.md`：**
+
+```markdown
+# 技术细节
+
+> 本次扫描采用的技术方案
+
+## 扫描方案
+
+1. **项目结构识别**：使用 Bash 工具执行目录扫描，识别项目类型
+2. **依赖分析**：读取 package.json / pom.xml / requirements.txt 等
+3. **代码分析**：使用 Glob 工具查找核心文件，读取关键代码
+4. **项目分类判断**：根据依赖和入口文件判断是纯前端/纯后端/全栈
+5. **AI 智能分析**：由 AI 理解代码并生成文档
+
+## 项目分类
+
+- **项目类型**: {Node.js/Java/Python/...}
+- **项目分类**: {纯前端/纯后端/全栈/库}
+- **是否生成 database/ 文档**: {是/否}
+- **是否生成 middleware/ 文档**: {是/否}
+
+## 技术决策
+
+### 决策：文档生成策略
+
+**背景**: 不同项目类型需要不同范围的文档
+
+**方案**: 根据项目分类自动跳过不相关的文档（如纯前端项目不生成 database/）
+
+**理由**: 避免生成无意义或误导性的文档
+```
+
+**`impact.md`：**
+
+```markdown
+# 影响范围
+
+> 本次扫描对项目的影响
+
+## 功能影响
 
 | 功能模块 | 影响程度 | 影响说明 |
 |----------|----------|----------|
 | 全局 | 无 | 仅新增文档，不影响代码 |
 
-### 性能影响
+## 性能影响
 
 - **响应时间**: 无变化
 - **内存占用**: 无变化
+- **构建时间**: 无变化
 
-### 安全影响
+## 安全影响
 
 - **认证**: 无影响
 - **授权**: 无影响
+- **数据安全**: 无影响
 
-### 兼容性影响
+## 兼容性影响
 
 - **API 兼容性**: 无变化
 - **数据兼容性**: 无变化
+- **客户端兼容性**: 无变化
 
----
+## 后续影响
 
-## 后续建议
+- ✅ 项目结构增加 `.ai-context/` 目录
+- ✅ 项目根目录增加 `CLAUDE.md` 和 `AGENTS.md`
+- ⚠️ 需要将 `.ai-context/` 加入版本控制
+```
 
-1. 定期运行 `/docs-scan --update` 保持文档同步
-2. 开发前使用 `/docs-prepare <任务>` 读取相关文档
-3. 开发后使用 `/docs-archive` 更新文档
+**`testing.md`：**
+
+```markdown
+# 测试验证
+
+> 本次扫描结果的验证
+
+## 文档质量检查
+
+- [x] README.md 已生成，包含项目概览
+- [x] architecture.md 已生成
+- [x] 模块文档已生成（如有）
+- [x] API 文档已生成（如有）
+- [x] 编码规范已生成
+- [x] changelog 索引已生成
+- [x] CLAUDE.md 工作流规则已生成
+- [x] AGENTS.md 行为规则已生成
+
+## 项目分类验证
+
+- [x] 正确识别项目类型
+- [x] 正确判断项目分类
+- [x] 按分类跳过不相关文档（如纯前端不生成 database/）
+
+## 测试结论
+
+- **文档完整性**: ✅ 通过
+- **分类正确性**: ✅ 通过
+- **可发布状态**: ✅ 可用
+```
+
+**`deployment.md`：**
+
+```markdown
+# 部署信息
+
+> 本次扫描的部署要求
+
+## 部署要求
+
+- **环境要求**: 无特殊要求
+- **配置变更**: 无
+- **依赖变更**: 无
+- **数据库变更**: 无
+
+## 部署步骤
+
+1. 提交 `.ai-context/` 目录到代码仓库
+2. 提交 `CLAUDE.md` 和 `AGENTS.md`
+3. 团队成员拉取最新代码
+
+## 验证步骤
+
+1. 在新项目根目录运行 `/docs-prepare <任务>` 测试文档读取
+2. 验证相关文档可正常读取
+
+## 后续计划
+
+### 日常维护
+
+- 开发前使用 `/docs-prepare <任务>` 读取相关文档
+- 开发后使用 `/docs-archive` 归档变更
+- 重大变更后使用 `/docs-update` 增量更新
+
+### 优化方向
+
+- 根据团队反馈优化文档模板
+- 定期检查文档与代码的同步性
 ```
 
 #### 8.7 创建 .ai-context/decisions/ 目录
@@ -2273,6 +3008,8 @@ status: accepted
 ```
 
 #### 8.8 创建 .ai-context/database/ 目录
+
+**⚠️ 条件生成**：仅当第二步半判定"是否生成 database/ 文档"为**是**时执行。
 
 基于第五步的数据库分析，创建数据库文档：
 
@@ -2353,6 +3090,8 @@ status: accepted
 ```
 
 #### 8.9 创建 .ai-context/middleware/ 目录
+
+**⚠️ 条件生成**：仅当第二步半判定"是否生成 middleware/ 文档"为**是**时执行。
 
 基于第六步的中间件分析，创建中间件文档：
 
@@ -2666,37 +3405,500 @@ AI 会自动：
 - API 变更需更新 API 文档
 ```
 
+#### 8.11 检测并归类项目已有文档
+
+> ⚠️ 在创建 `initial-scan/docs/` 之前执行。
+> 如果用户**拒绝归类**，则**不创建 docs/ 子目录**。
+
+**目的**：项目下可能散落着 .md 文档（README、架构文档、会议纪要等），在初次扫描时询问用户是否归类到 `initial-scan/docs/` 下。
+
+**执行流程：**
+
+1. **扫描项目已有 .md 文档**
+
+   ```bash
+   find . -type f -name "*.md" \
+     -not -path "./.ai-context/*" \
+     -not -path "./.git/*" \
+     -not -path "./node_modules/*" \
+     -not -path "./dist/*" \
+     -not -path "./build/*" \
+     -not -path "./.claude/*" | sort
+   ```
+
+2. **智能归类（按文件名/内容关键词）**
+
+   | 关键词 | 归类到 |
+   |--------|--------|
+   | `requirement`、`prd`、`需求`、`用户故事` | `docs/requirements/` |
+   | `technical`、`design`、`架构`、`技术方案`、`api` | `docs/technical/` |
+   | `test`、`testing`、`测试`、`qa`、`测试报告` | `docs/testing/` |
+   | `ui`、`mockup`、`prototype`、`figma`、`设计稿` | `docs/design/` |
+   | `meeting`、`notes`、`纪要`、`readme`、`参考` | `docs/other/` |
+   | 其他 | `docs/other/`（默认） |
+
+3. **使用 AskUserQuestion 询问用户**
+
+   ```
+   检测到项目下有 N 个 .md 文档，建议归类如下：
+
+   📂 requirements/ (X 个)
+      - docs/PRD.md
+   📂 technical/ (Y 个)
+      - docs/architecture.md
+   📂 testing/ (Z 个)
+      - docs/test-report.md
+   📂 design/ (A 个)
+      - docs/ui-mockup.md
+   📂 other/ (B 个)
+      - README.md
+
+   是否将这些文档归类到 .ai-context/changelog/{date}-initial-scan/docs/ 下？
+   ```
+
+   **用户选项：**
+
+   | 选项 | 行为 |
+   |------|------|
+   | ✅ 全部归类 | 复制所有文档到对应 docs/ 子目录 |
+   | 🔧 部分归类 | 用户指定具体要归类的文件 |
+   | ❌ 不归类 | 不创建 docs/ 子目录 |
+
+4. **执行归类（如用户同意）**
+
+   ```bash
+   mkdir -p .ai-context/changelog/{date}-initial-scan/docs/{requirements,technical,testing,design,other}
+   cp docs/PRD.md .ai-context/changelog/{date}-initial-scan/docs/requirements/
+   cp docs/architecture.md .ai-context/changelog/{date}-initial-scan/docs/technical/
+   # ... 按归类复制
+   ```
+
+5. **跳过归类（如用户拒绝）**
+   - 不创建 `.ai-context/changelog/{date}-initial-scan/docs/` 目录
+   - 在 `overview.md` 中注明"用户已有文档但未归类"
+   - 提示用户：未来可用 `/docs-archive` 时手动归类
+
 ### 第九步：输出扫描摘要
 
-扫描完成后，输出：
+扫描完成后，**根据实际生成情况动态输出摘要**：
 
 ```
 ✅ 文档生成完成！
+
+项目分类：{纯前端/纯后端/全栈/库/桌面移动}
 
 已生成的文档：
 - .ai-context/README.md - 项目概览
 - .ai-context/architecture.md - 系统架构
 - .ai-context/modules/{模块1}.md - {模块1}模块文档
 - .ai-context/modules/{模块2}.md - {模块2}模块文档
-- .ai-context/api/{API1}.md - {API1}接口文档
-- .ai-context/database/README.md - 数据库设计（新增）
-- .ai-context/middleware/README.md - 中间件使用（新增）
 - .ai-context/guidelines/coding-style.md - 编码规范
-- .ai-context/changelog/{日期}.md - 变更记录
-- .ai-context/decisions/{决策}.md - 技术决策
+- .ai-context/changelog/README.md - 变更索引
+- .ai-context/changelog/{日期}-initial-scan/ - 初始扫描记录
 - CLAUDE.md - 工作流规则（新建/已更新）
 - AGENTS.md - AI Agent 行为规则（新建/已更新）
+- .ai-context/decisions/{决策}.md - 技术决策
+{以下文档仅在条件满足时显示}
+- .ai-context/api/{API1}.md - {API1}接口文档  ← 仅当有后端服务时
+- .ai-context/database/README.md - 数据库设计  ← 仅当涉及数据库时
+- .ai-context/middleware/README.md - 中间件使用  ← 仅当涉及中间件时
 
 文档质量说明：
 - 所有文档基于 AI 对代码的理解生成
 - 包含真实的业务逻辑分析
-- 包含完整的接口文档
-- 包含详细的数据库设计和中间件使用说明
+- 根据项目分类自动跳过不相关的文档（如纯前端项目不生成数据库文档）
 
 使用方法：
 - 开发前：/docs-prepare <任务描述>
 - 开发后：/docs-archive
 ```
+
+---
+
+## 指令 1.5：/docs-check（检测文档结构并自动迁移）
+
+**当用户输入 `/docs-check` 时，执行以下完整流程：**
+
+> ⚠️ 本命令**检测到问题会自动迁移**，无需用户确认。
+> 如需仅检测不修复，请使用 `/docs-check --report` 模式。
+
+### 步骤 1：检查前置条件
+
+- 检查 `.ai-context/` 目录是否存在
+- 如果不存在，提示用户先运行 `/docs-scan` 生成文档
+
+### 步骤 2：检测 changelog 目录结构
+
+使用 Bash 工具列出 `changelog/` 下的所有条目：
+
+```bash
+ls -la .ai-context/changelog/
+```
+
+**判断规则**：
+
+| 条目类型 | 是否新格式 | 状态 |
+|----------|------------|------|
+| `{date}-{name}/` 文件夹 | ✅ 新格式 | 跳过 |
+| `{date}-{name}.md` 单文件 | ❌ 旧格式 | **需要迁移** |
+| 混合存在 | ⚠️ 部分迁移 | **需要迁移旧文件** |
+
+### 步骤 3：检测 changelog/README.md 表格格式
+
+读取 `changelog/README.md`，定位"变更历史"或"最近变更"表格。
+
+**检查表格列头**：
+
+| 列头模式 | 版本 | 状态 |
+|----------|------|------|
+| `日期 \| 标题 \| 描述 \| 类型 \| 模块 \| 作者 \| 状态 \| 详情` | v3.1.1+ | ✅ 最新 |
+| `日期 \| 类型 \| 标题 \| 作者 \| 状态` | v3.1.0 及之前 | ❌ **需要迁移** |
+| `日期 \| 标题 \| 类型 \| 模块 \| 作者 \| 状态 \| 详情` | v3.1.0 | ⚠️ **需要补"描述"列** |
+
+### 步骤 4：检测 docs/ 子目录
+
+对每个 changelog 文件夹，检查 `docs/` 子目录结构：
+
+```bash
+ls -la .ai-context/changelog/*/docs/ 2>/dev/null
+```
+
+**标准结构**：
+
+```
+docs/
+├── requirements/
+├── technical/
+├── testing/
+├── design/
+└── other/
+```
+
+### 步骤 4.5：检测项目已有文档并询问归类（**批量处理**）
+
+> 🔴 **关键规则：必须一次性扫描 → 一次性询问 → 一次性归类。禁止逐个文件询问。**
+
+**触发逻辑：**
+
+| 当前状态 | 是否询问 |
+|----------|----------|
+| docs/ 不存在 | ✅ 询问 |
+| docs/ 存在但子目录全空 | ✅ 询问 |
+| docs/ 存在且已有内容 | ⚠️ 询问是否增量归类（只填空的子目录） |
+| 项目下没有任何 .md | ❌ 跳过 |
+
+#### 4.5.1 一次性扫描所有 .md 文档
+
+**使用 Glob 工具**（不是逐个 find）：
+
+```
+**/*.md
+```
+
+然后**过滤掉**（不是逐个判断）：
+- `.ai-context/**`
+- `node_modules/**`
+- `dist/**`
+- `build/**`
+- `.git/**`
+- `.claude/**`
+- **`CLAUDE.md`**（工作流规则文件，不归类）
+- **`AGENTS.md`**（AI Agent 规则文件，不归类）
+
+**得到完整待归类文件列表**（比如 N 个）。
+
+#### 4.5.2 一次性智能归类所有文档
+
+**批量分析**所有 N 个文件，构建完整归类映射表：
+
+```python
+mapping = {
+    "README.md": "other/",
+    "docs/PRD.md": "requirements/",
+    "docs/architecture.md": "technical/",
+    "docs/test-report.md": "testing/",
+    "docs/ui-mockup.md": "design/",
+    "docs/meeting-notes.md": "other/",
+    # ... 一次性分析完所有 N 个
+}
+```
+
+**关键词规则：**
+
+| 关键词 | 归类到 |
+|--------|--------|
+| `requirement`、`prd`、`需求`、`用户故事` | `requirements/` |
+| `technical`、`design`、`架构`、`技术方案`、`api` | `technical/` |
+| `test`、`testing`、`测试`、`qa`、`测试报告` | `testing/` |
+| `ui`、`mockup`、`prototype`、`figma`、`设计稿` | `design/` |
+| `meeting`、`notes`、`纪要`、`readme`、`参考` | `other/` |
+| 其他 | `other/`（默认） |
+
+#### 4.5.3 一次性询问用户（关键！）
+
+> 🔴 **必须用 AskUserQuestion 工具一次性询问**。
+> ❌ 禁止：numbered menu、逐个确认、每个文件单独问。
+
+**AskUserQuestion 调用示例**：
+
+```python
+AskUserQuestion(
+    question=f"检测到项目下有 {N} 个 .md 文档，是否批量归类？",
+    options=[
+        {
+            "label": "✅ 全部归类",
+            "description": f"将 {N} 个文档一次性复制到 docs/（requirements: X, technical: Y, testing: Z, design: A, other: B）"
+        },
+        {
+            "label": "🔧 选择性归类",
+            "description": "我会列出每个文件的归类建议，你选择具体哪些要归类"
+        },
+        {
+            "label": "❌ 不归类",
+            "description": "保持原文件位置不变，不创建 docs/ 子目录"
+        }
+    ]
+)
+```
+
+**等待用户回答**（一次回答处理所有文件）。
+
+#### 4.5.4 一次性执行归类
+
+**根据用户选择执行**：
+
+**用户选择"全部归类"**：
+
+```bash
+# 一次性创建所有子目录
+mkdir -p .ai-context/changelog/{date}-initial-scan/docs/{requirements,technical,testing,design,other}
+
+# 一次性移动所有文件（mv 而非 cp，原文件位置不保留）
+for src, category in mapping.items():
+    mv "$src" ".ai-context/changelog/{date}-initial-scan/docs/$category/"
+done
+```
+
+> 🔴 **关键：使用 `mv` 移动，不是 `cp` 复制**。归类后原文件位置不应保留。
+
+**用户选择"选择性归类"**：
+
+按用户指定的子集执行，**仍然是一次性执行**（不再追问）。
+
+**用户选择"不归类"**：
+
+- 跳过步骤 6.3 的"创建缺失子目录"
+- 在最终报告里标注"用户已拒绝归类，docs/ 未创建"
+- **不再次询问**
+
+#### 4.5.5 输出批量归类报告（一次性）
+
+```
+✅ 批量归类完成
+
+归类统计：
+- requirements/: X 个
+- technical/: Y 个
+- testing/: Z 个
+- design/: A 个
+- other/: B 个
+- 总计: N 个
+
+已复制的文件：
+- README.md → docs/other/
+- docs/PRD.md → docs/requirements/
+- docs/architecture.md → docs/technical/
+- ...
+```
+
+### 步骤 5：检测标题填写质量
+
+读取最近 3 条 changelog 记录的"标题"列：
+
+- 标题只包含 `feat`/`fix`/`refactor`/`docs`/`chore` 等类型词 → ❌ **需要改进**
+- 标题包含具体动作 → ✅ 合格
+
+### 步骤 6：执行自动迁移
+
+> 🔧 **检测到问题后自动执行以下迁移操作**：
+
+#### 6.1 迁移旧格式 changelog（单文件 → 文件夹）
+
+对每个旧格式的单文件 `{date}-{name}.md`：
+
+1. **创建文件夹** `.ai-context/changelog/{date}-{name}/`
+2. **拆分单文件内容到 6 个核心文档**：
+
+   | 原始章节 | 目标文件 |
+   |----------|----------|
+   | 概述/背景/需求 | `overview.md` |
+   | 文件清单/变更列表 | `files.md` |
+   | 技术细节/实现 | `technical.md` |
+   | 影响范围/兼容性 | `impact.md` |
+   | 测试/验证 | `testing.md` |
+   | 部署/回滚 | `deployment.md` |
+
+3. **拆分规则**：
+   - 读取原文件全部内容
+   - 按 H2 标题（`##`）切分段落
+   - 将每个段落写入对应文件
+   - 如无明确章节，按默认分配（首段→overview，其余→technical）
+
+4. **创建空的 docs/ 子目录**
+
+5. **删除原单文件**
+
+**示例迁移：**
+
+```
+迁移前：
+  .ai-context/changelog/2026-06-01-initial-scan.md
+
+迁移后：
+  .ai-context/changelog/2026-06-01-initial-scan/
+  ├── overview.md
+  ├── files.md
+  ├── technical.md
+  ├── impact.md
+  ├── testing.md
+  ├── deployment.md
+  └── docs/
+      ├── requirements/
+      ├── technical/
+      ├── testing/
+      ├── design/
+      └── other/
+```
+
+#### 6.2 升级 changelog/README.md 表格格式
+
+**情况 A：5 列旧格式 → 8 列新格式**
+
+```diff
+- | 日期 | 类型 | 标题 | 作者 | 状态 |
++ | 日期 | 标题 | 描述 | 类型 | 模块 | 作者 | 状态 | 详情 |
+```
+
+迁移逻辑：
+- 读取现有表格
+- 将"类型"和"标题"列内容拆分到新表格对应列
+- "模块"列从 folder 名称推断（如 `add-auth` → 模块=auth）
+- "详情"列生成对应链接 `./{folder-name}/`
+- "描述"列填入"—"占位
+- "作者"列填入 "AI 自动归档"
+
+**情况 B：7 列缺"描述"列 → 8 列**
+
+在"标题"和"类型"之间插入"描述"列。
+
+#### 6.3 创建缺失的 docs/ 子目录
+
+对每个 changelog 文件夹，如果 `docs/` 不存在或子目录缺失：
+
+```bash
+mkdir -p .ai-context/changelog/{folder}/docs/requirements
+mkdir -p .ai-context/changelog/{folder}/docs/technical
+mkdir -p .ai-context/changelog/{folder}/docs/testing
+mkdir -p .ai-context/changelog/{folder}/docs/design
+mkdir -p .ai-context/changelog/{folder}/docs/other
+```
+
+每个子目录创建 `.gitkeep` 文件。
+
+#### 6.4 改进"标题"列质量
+
+如果标题列只填了类型：
+
+- 使用文件夹名推断标题：
+  - `2026-06-01-add-user-auth` → "添加用户认证"
+  - `2026-06-15-fix-login-bug` → "修复登录 bug"
+- 如无法推断，使用 "feat 变更" 占位
+
+### 步骤 7：输出迁移报告
+
+```
+🔧 文档结构检测 + 迁移完成
+
+检测时间：{当前时间}
+文档位置：.ai-context/
+当前插件版本：3.1.2
+
+---
+
+## 📊 总体状态
+
+| 维度 | 检测前 | 检测后 |
+|------|--------|--------|
+| changelog 结构 | ❌ 旧格式 | ✅ 已迁移 |
+| 表格格式 | ❌ 5 列 | ✅ 8 列 |
+| docs/ 子目录 | ⚠️ 缺失 | ✅ 已创建 |
+| 标题质量 | ⚠️ 不合格 | ✅ 已改进 |
+
+---
+
+## 🔧 已执行的迁移操作
+
+### ✅ 1. 单文件 → 文件夹结构
+
+| 旧文件 | 新文件夹 | 状态 |
+|--------|----------|------|
+| {date}-{name}.md | {date}-{name}/ | ✅ 已迁移 |
+
+### ✅ 2. 表格格式升级
+
+| 文件 | 旧列数 | 新列数 | 状态 |
+|------|--------|--------|------|
+| changelog/README.md | 5 | 8 | ✅ 已升级 |
+
+### ✅ 3. docs/ 子目录创建
+
+| changelog 文件夹 | 操作 | 状态 |
+|------------------|------|------|
+| {folder} | 创建 5 个子目录 | ✅ 已创建 |
+
+### ✅ 4. 标题改进
+
+| 文件 | 旧标题 | 新标题 | 状态 |
+|------|--------|--------|------|
+| changelog/README.md | "feat" | "添加 XX 功能" | ✅ 已改进 |
+
+---
+
+## ⚠️ 仍需手动处理
+
+- **描述列**：所有迁移后的"描述"列填入"—"占位，建议手动补充
+- **docs/ 内容**：docs/ 子目录是空的，等待用户提供需求/技术/测试等文档
+- **拆分准确性**：原单文件如有未识别章节，可能需要手动调整
+
+---
+
+## 💡 建议后续操作
+
+1. 手动补充每条 changelog 的"描述"列
+2. 整理 docs/ 子目录，添加用户提供的文档
+3. 提交变更：`git add .ai-context/ && git commit -m "chore: migrate docs to v3.1.2 structure"`
+
+---
+
+✅ 迁移完成！所有检测到的问题已自动修复。
+```
+
+### 仅检测模式（可选）
+
+如需**只检测不修复**，使用：
+
+```
+/docs-check --report
+```
+
+执行流程跳过步骤 6（自动迁移），只输出步骤 2-5 的检测报告。
+
+### 注意事项
+
+- 自动迁移**不可逆**，建议迁移前备份 `.ai-context/changelog/`
+- 拆分单文件时按 H2 章节切分，如章节不清晰可能需要手动调整
+- 表格列升级会保留原"标题"列内容，"描述"列填入"—"占位
+- docs/ 子目录是**空目录**，等待用户后续添加文档
 
 ---
 
