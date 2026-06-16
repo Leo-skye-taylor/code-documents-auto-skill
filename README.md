@@ -20,21 +20,30 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                    🔄 Simple Workflow                       │
 ├─────────────────────────────────────────────────────────────┤
-│  User: "/docs-scan"                                         │
+│                                                             │
+│  🆕 After Plugin Upgrade:                                   │
+│  User: "/docs-check"                                        │
 │      ↓                                                      │
-│  🤖 AI scans codebase and generates documentation           │
+│  🔧 AI detects & auto-migrates old docs structure           │
 │      ↓                                                      │
-│  User: "/docs-prepare add login feature"                       │
-│      ↓                                                      │
-│  📖 AI reads related docs and outputs development plan      │
-│      ↓                                                      │
-│  💻 User implements the feature                             │
-│      ↓                                                      │
-│  User: "/docs-archive"                                      │
-│      ↓                                                      │
-│  📝 AI summarizes & updates all related docs                │
-│      ↓                                                      │
-│  ✅ Documentation updated!                                  │
+│  ┌───────────────────────────────────────────────────┐      │
+│  │  📂 New Project:                                  │      │
+│  │  User: "/docs-scan"                               │      │
+│  │      ↓                                            │      │
+│  │  🤖 AI scans codebase and generates documentation │      │
+│  │      ↓                                            │      │
+│  │  User: "/docs-prepare add login feature"          │      │
+│  │      ↓                                            │      │
+│  │  📖 AI reads related docs and outputs dev plan    │      │
+│  │      ↓                                            │      │
+│  │  💻 User implements the feature                   │      │
+│  │      ↓                                            │      │
+│  │  User: "/docs-archive"                            │      │
+│  │      ↓                                            │      │
+│  │  📝 AI summarizes & updates all related docs      │      │
+│  │      ↓                                            │      │
+│  │  ✅ Documentation updated!                        │      │
+│  └───────────────────────────────────────────────────┘      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -46,6 +55,7 @@
 | 📖 **Auto Read** | AI reads docs and outputs development plan before coding |
 | 📝 **Auto Archive** | AI summarizes changes and updates all related docs |
 | 🔄 **Incremental Update** | Support incremental updates, only update changed parts |
+| 🔧 **Auto Migrate** | `/docs-check` detects outdated structure and auto-migrates to latest format |
 | 📊 **Changelog System** | Complete changelog with statistics, history, and dev cycles |
 | 🚀 **Multiple Commands** | `/docs`, `/docs-scan`, `/docs-update`, `/docs-check`, `/docs-prepare`, `/docs-archive` |
 
@@ -88,6 +98,49 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 # Reinstall latest version
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
+
+### 🆙 Upgrade Existing Project
+
+If you're upgrading from an older version (e.g. v3.1.0 or earlier), run `/docs-check` once to auto-migrate your existing docs:
+
+```bash
+/docs-check
+```
+
+**What `/docs-check` does:**
+
+| Action | Description |
+|--------|-------------|
+| 🔍 **Detects** | Scans `.ai-context/` for outdated structures |
+| 📁 **Splits** | Single-file changelogs → folder with 6 core docs |
+| 📊 **Upgrades** | 5-column old table → 8-column new format (with 描述) |
+| 📂 **Creates** | Missing docs/ subdirectories (requirements/technical/testing/design/other) |
+| 🏷️ **Improves** | Generic titles (just "feat") → descriptive titles from folder names |
+| 📦 **Categorizes** | Batch-moves project docs to docs/ subdirs (one prompt, not per-file) |
+
+**Migration example:**
+
+```diff
+  ❌ Before (v3.1.0):
+  .ai-context/changelog/2026-06-16-initial-scan.md
+
+  ✅ After (v3.1.2 with /docs-check):
+  .ai-context/changelog/2026-06-16-initial-scan/
+  ├── overview.md
+  ├── files.md
+  ├── technical.md
+  ├── impact.md
+  ├── testing.md
+  ├── deployment.md
+  └── docs/
+      ├── requirements/  ← project docs auto-categorized
+      ├── technical/
+      ├── testing/
+      ├── design/
+      └── other/
+```
+
+> 💡 **Tip**: After running `/docs-check`, you can verify the migration by checking the `.ai-context/changelog/` folder.
 
 ### 🎮 Usage
 
@@ -176,21 +229,30 @@ project-root/
 ┌─────────────────────────────────────────────────────────────┐
 │                    🔄 简单工作流                              │
 ├─────────────────────────────────────────────────────────────┤
-│  用户: "/docs-scan"                                          │
-│      ↓                                                       │
-│  🤖 AI 扫描代码库并生成文档                                    │
-│      ↓                                                       │
-│  用户: "/docs-prepare 添加登录功能"                               │
-│      ↓                                                       │
-│  📖 AI 自动读取相关文档并输出开发方案                            │
-│      ↓                                                       │
-│  💻 用户实现功能                                               │
-│      ↓                                                       │
-│  用户: "/docs-archive"                                        │
-│      ↓                                                       │
-│  📝 AI 总结变更并更新所有相关文档                                │
-│      ↓                                                       │
-│  ✅ 文档已更新！                                               │
+│                                                             │
+│  🆕 升级插件后：                                              │
+│  用户: "/docs-check"                                         │
+│      ↓                                                      │
+│  🔧 AI 检测并自动迁移旧文档结构                                │
+│      ↓                                                      │
+│  ┌───────────────────────────────────────────────────┐      │
+│  │  📂 新项目流程：                                   │      │
+│  │  用户: "/docs-scan"                                │      │
+│  │      ↓                                            │      │
+│  │  🤖 AI 扫描代码库并生成文档                        │      │
+│  │      ↓                                            │      │
+│  │  用户: "/docs-prepare 添加登录功能"                 │      │
+│  │      ↓                                            │      │
+│  │  📖 AI 自动读取相关文档并输出开发方案              │      │
+│  │      ↓                                            │      │
+│  │  💻 用户实现功能                                   │      │
+│  │      ↓                                            │      │
+│  │  用户: "/docs-archive"                            │      │
+│  │      ↓                                            │      │
+│  │  📝 AI 总结变更并更新所有相关文档                  │      │
+│  │      ↓                                            │      │
+│  │  ✅ 文档已更新！                                   │      │
+│  └───────────────────────────────────────────────────┘      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -202,6 +264,7 @@ project-root/
 | 📖 **自动读取** | 编码前 AI 自动读取文档并输出开发方案 |
 | 📝 **自动归档** | AI 总结变更并更新所有相关文档 |
 | 🔄 **增量更新** | 支持增量更新，只更新变更部分 |
+| 🔧 **自动迁移** | `/docs-check` 检测过时结构并自动迁移到最新格式 |
 | 📊 **变更记录系统** | 完整的变更记录，包含统计、历史和开发周期 |
 | 🚀 **多指令支持** | `/docs`、`/docs-scan`、`/docs-update`、`/docs-check`、`/docs-prepare`、`/docs-archive` |
 
@@ -244,6 +307,49 @@ rm -rf ~/.claude/plugins/cache/code-documents-auto-skill
 # 重新安装最新版本
 /plugin install code-documents-auto@code-documents-auto-skill
 ```
+
+### 🆙 升级现有项目
+
+如果你从旧版本（比如 v3.1.0 或更早）升级，**跑一次 `/docs-check`** 即可自动迁移你的现有文档：
+
+```bash
+/docs-check
+```
+
+**`/docs-check` 会做什么：**
+
+| 操作 | 说明 |
+|------|------|
+| 🔍 **检测** | 扫描 `.ai-context/`，识别过时结构 |
+| 📁 **拆分** | 单文件 changelog → 文件夹 + 6 个核心文档 |
+| 📊 **升级** | 5 列旧表格 → 8 列新格式（含"描述"列） |
+| 📂 **创建** | 缺失的 docs/ 子目录（requirements/technical/testing/design/other） |
+| 🏷️ **改进** | 通用标题（如只填"feat"）→ 从文件夹名生成描述性标题 |
+| 📦 **归类** | 批量移动项目文档到 docs/ 子目录（一次询问，不逐个问） |
+
+**迁移效果示例：**
+
+```diff
+  ❌ 升级前 (v3.1.0)：
+  .ai-context/changelog/2026-06-16-initial-scan.md
+
+  ✅ 升级后 (v3.1.2 跑 /docs-check)：
+  .ai-context/changelog/2026-06-16-initial-scan/
+  ├── overview.md
+  ├── files.md
+  ├── technical.md
+  ├── impact.md
+  ├── testing.md
+  ├── deployment.md
+  └── docs/
+      ├── requirements/  ← 项目文档自动归类到这里
+      ├── technical/
+      ├── testing/
+      ├── design/
+      └── other/
+```
+
+> 💡 **贴士**：跑完 `/docs-check` 后，可以查看 `.ai-context/changelog/` 目录确认迁移效果。
 
 ### 🎮 使用方法
 
