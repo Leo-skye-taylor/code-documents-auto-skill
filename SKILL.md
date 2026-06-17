@@ -3587,12 +3587,21 @@ docs/
 | docs/ 存在且已有内容 | ⚠️ 询问是否增量归类（只填空的子目录） |
 | 项目下没有任何 .md | ❌ 跳过 |
 
-#### 4.5.1 一次性扫描所有 .md 文档
+#### 4.5.1 一次性扫描所有待归类文件
 
-**使用 Glob 工具**（不是逐个 find）：
+**使用 Glob 工具**（不是逐个 find），扫描以下扩展名：
 
 ```
+# 文档
 **/*.md
+
+# 图片
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.svg
 ```
 
 然后**过滤掉**（不是逐个判断）：
@@ -3604,35 +3613,52 @@ docs/
 - `.claude/**`
 - **`CLAUDE.md`**（工作流规则文件，不归类）
 - **`AGENTS.md`**（AI Agent 规则文件，不归类）
+- 项目 logo / favicon（如 `assets/logo.png`、`favicon.ico`）— 工程资源不归类
 
 **得到完整待归类文件列表**（比如 N 个）。
 
-#### 4.5.2 一次性智能归类所有文档
+#### 4.5.2 一次性智能归类所有文件
 
 **批量分析**所有 N 个文件，构建完整归类映射表：
 
 ```python
 mapping = {
+    # 文档
     "README.md": "other/",
     "docs/PRD.md": "requirements/",
     "docs/architecture.md": "technical/",
     "docs/test-report.md": "testing/",
     "docs/ui-mockup.md": "design/",
     "docs/meeting-notes.md": "other/",
+
+    # 图片
+    "docs/architecture-diagram.png": "technical/",
+    "docs/ui-mockup.png": "design/",
+    "docs/figma-export.jpg": "design/",
+    "docs/test-screenshot.png": "testing/",
+    "docs/flowchart.svg": "design/",
     # ... 一次性分析完所有 N 个
 }
 ```
 
-**关键词规则：**
+**关键词规则（文档 + 图片通用）：**
 
 | 关键词 | 归类到 |
 |--------|--------|
 | `requirement`、`prd`、`需求`、`用户故事` | `requirements/` |
-| `technical`、`design`、`架构`、`技术方案`、`api` | `technical/` |
-| `test`、`testing`、`测试`、`qa`、`测试报告` | `testing/` |
-| `ui`、`mockup`、`prototype`、`figma`、`设计稿` | `design/` |
+| `architecture`、`tech`、`api`、`架构`、`技术方案`、`er-diagram`、`schema` | `technical/` |
+| `test`、`testing`、`测试`、`qa`、`screenshot`、`截图`、`bug`、`问题` | `testing/` |
+| `ui`、`mockup`、`prototype`、`figma`、`设计稿`、`flowchart`、`流程图`、`diagram` | `design/` |
 | `meeting`、`notes`、`纪要`、`readme`、`参考` | `other/` |
-| 其他 | `other/`（默认） |
+| 其他文档（.md） | `other/`（默认） |
+| 其他图片（.png/.jpg/.svg/...） | `design/`（默认，因图片多与设计相关） |
+
+**图片归类的特殊规则：**
+
+- 默认图片归到 `design/`（因为图片大多是 UI 设计、流程图、架构图）
+- 文件名含 `screenshot`/`截图`/`bug` 优先归到 `testing/`
+- 文件名含 `architecture`/`er-diagram`/`api` 优先归到 `technical/`
+- 文件名含 `flowchart`/`流程图`/`mockup` 归到 `design/`
 
 #### 4.5.3 一次性询问用户（关键！）
 
@@ -3643,11 +3669,11 @@ mapping = {
 
 ```python
 AskUserQuestion(
-    question=f"检测到项目下有 {N} 个 .md 文档，是否批量归类？",
+    question=f"检测到项目下有 {N} 个待归类文件（含 {M} 个文档 + {K} 个图片），是否批量归类？",
     options=[
         {
             "label": "✅ 全部归类",
-            "description": f"将 {N} 个文档一次性复制到 docs/（requirements: X, technical: Y, testing: Z, design: A, other: B）"
+            "description": f"将 {N} 个文件一次性移动到 docs/（requirements: X, technical: Y, testing: Z, design: A, other: B）"
         },
         {
             "label": "🔧 选择性归类",
