@@ -115,7 +115,9 @@ docs/
 - `.claude/**`
 - **`CLAUDE.md`**（工作流规则文件，不归类）
 - **`AGENTS.md`**（AI Agent 规则文件，不归类）
-- 项目 logo / favicon（如 `assets/logo.png`、`favicon.ico`）— 工程资源不归类
+- 项目 favicon（仅 `favicon.ico`、`favicon.png`、`favicon.svg` 等以 `favicon` 开头）— 浏览器标签图标，工程资源不归类
+
+> ⚠️ **`logo.*`、`icon.*`、`icon-*.*`、`*-icon.*` 等 UI 图标不要排除**——它们是设计资产，应当归类到 `design/`（参见 4.5.2）。
 
 **得到完整待归类文件列表**（比如 N 个）。
 
@@ -139,6 +141,8 @@ mapping = {
     "docs/figma-export.jpg": "design/",
     "docs/test-screenshot.png": "testing/",
     "docs/flowchart.svg": "design/",
+    "icon.svg": "design/",          # UI 图标归 design/
+    "logo.svg": "design/",          # 项目 logo 归 design/（如需保留原位可让用户选择）
     # ... 一次性分析完所有 N 个
 }
 ```
@@ -150,7 +154,7 @@ mapping = {
 | `requirement`、`prd`、`需求`、`用户故事` | `requirements/` |
 | `architecture`、`tech`、`api`、`架构`、`技术方案`、`er-diagram`、`schema` | `technical/` |
 | `test`、`testing`、`测试`、`qa`、`screenshot`、`截图`、`bug`、`问题` | `testing/` |
-| `ui`、`mockup`、`prototype`、`figma`、`设计稿`、`flowchart`、`流程图`、`diagram` | `design/` |
+| `ui`、`mockup`、`prototype`、`figma`、`设计稿`、`flowchart`、`流程图`、`diagram`、`icon`、`logo`、`图标` | `design/` |
 | `meeting`、`notes`、`纪要`、`readme`、`参考` | `other/` |
 | 其他文档（.md） | `other/`（默认） |
 | 其他图片（.png/.jpg/.svg/...） | `design/`（默认，因图片多与设计相关） |
