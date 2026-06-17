@@ -1,6 +1,6 @@
 # 🚀 Code Documents Auto Skill
 
-[![Version](https://img.shields.io/badge/version-3.1.2-blue.svg)](https://github.com/Leo-skye-taylor/code-documents-auto-skill)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/Leo-skye-taylor/code-documents-auto-skill)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-purple.svg)](https://claude.ai/code)
 
@@ -58,6 +58,12 @@
 | 🔧 **Auto Migrate** | `/docs-check` detects outdated structure and auto-migrates to latest format |
 | 📊 **Changelog System** | Complete changelog with statistics, history, and dev cycles |
 | 🚀 **Multiple Commands** | `/docs`, `/docs-scan`, `/docs-update`, `/docs-check`, `/docs-prepare`, `/docs-archive` |
+
+### 🆕 What's New in 3.2.0
+
+- **UI Design Asset Support**: `icon.svg`, `logo.svg`, `icon-*.png` and other UI icons are now properly categorized into `docs/design/` instead of being excluded
+- **Refined Asset Filtering**: Only `favicon.*` is treated as engineering resource (browser tab icon) — all other design assets are scanned and categorized
+- **Icon/Logo Keyword Rules**: New keywords `icon`, `logo`, `图标` route matching files to `design/` (in addition to existing `ui`, `mockup`, `figma`, etc.)
 
 ### 🆕 What's New in 3.1.2
 
@@ -267,6 +273,12 @@ project-root/
 | 🔧 **自动迁移** | `/docs-check` 检测过时结构并自动迁移到最新格式 |
 | 📊 **变更记录系统** | 完整的变更记录，包含统计、历史和开发周期 |
 | 🚀 **多指令支持** | `/docs`、`/docs-scan`、`/docs-update`、`/docs-check`、`/docs-prepare`、`/docs-archive` |
+
+### 🆕 3.2.0 版本更新
+
+- **UI 设计资产支持**：`icon.svg`、`logo.svg`、`icon-*.png` 等 UI 图标现在会正确归类到 `docs/design/`，不再被误排除
+- **资源过滤更精细**：仅 `favicon.*` 视为工程资源（浏览器标签图标）排除，其他设计资产全部参与归类
+- **新增 icon/logo 关键词**：归类规则新增 `icon`、`logo`、`图标` 关键词，与 `ui`、`mockup`、`figma` 等并列
 
 ### 🆕 3.1.2 版本更新
 
